@@ -1,15 +1,21 @@
 (defvar *keep-going* t)
 
-(defun make-command-case (one-case)
-  (let* ((command-string (first one-case))
-	 (handler (second one-case))
-	 (command-len (length command-string)))
-  `((string= command ,command-string :end1 (min len ,command-len))
-    (funcall ,handler (string-trim " " (subseq command (min len ,command-len)))))))
+(defun make-command-case (command-var len-var)
+  (lambda (one-case)
+    (let* ((command-string (first one-case))
+	   (handler (second one-case))
+	   (command-len (length command-string))
+	   (arg-name (gensym)))
+      `((string= ,command-var ,command-string :end1 (min ,len-var ,command-len))
+	(let ((,arg-name (subseq ,command-var (min ,len-var ,command-len))))
+	  (funcall ,handler (string-trim " " ,arg-name)))))))
 
-(defmacro command-case (command &rest cases)
-  `(let ((len (length ,command)))
-     (cond ,@(mapcar 'make-command-case cases))))
+(defmacro command-case (cmd &rest cases)
+  (let ((command-var (gensym))
+	(len-var (gensym)))
+    `(let ((,command-var ,cmd)
+	   (,len-var (length ,cmd)))
+       (cond ,@(mapcar (make-command-case command-var len-var) cases)))))
 
 (defun unknown-command (command)
   (format nil "unknown command \"~a\"" command))
@@ -18,14 +24,19 @@
   `#'(lambda (arg) ,reply)) 
 
 (defun maki-uchi-log (arg)
-  (format nil "log ~a of maki-uchi" arg))
+  (format nil "log ~a maki-uchi" arg))
+
+(defun maki-uchi (arg)
+  (command-case arg
+		("status" (just-reply "maki-uchi status"))
+		("log" 'maki-uchi-log)))
 
 (defun process (command)
   (command-case command
 		("hello" (just-reply "hello"))
 		("goodbye" (just-reply "goodbye"))
 		("unintelligible" (just-reply "failed to parse"))
-		("maki-uchi log" 'maki-uchi-log)
+		("maki-uchi" 'maki-uchi)
 		("" 'unknown-command)))
 
 (defun main-loop ()
