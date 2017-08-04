@@ -1,3 +1,9 @@
+(load "package.lisp")
+
+(load "translate.lisp")
+
+(in-package #:com.aragaer.pa-brain)
+
 (defvar *keep-going* t)
 
 (defun make-command-case (command-var len-var)
@@ -18,10 +24,10 @@
        (cond ,@(mapcar (make-command-case command-var len-var) cases)))))
 
 (defun unknown-command (command)
-  (format nil "unknown command \"~a\"" command))
+  (translate-pa2human (format nil "unknown command \"~a\"" command)))
 
 (defmacro just-reply (reply)
-  `#'(lambda (arg) ,reply)) 
+  `#'(lambda (arg) (translate-pa2human ,reply)))
 
 (defun maki-uchi-log (arg)
   (format nil "log ~a maki-uchi" arg))
@@ -42,5 +48,3 @@
 (defun main-loop ()
   (loop while *keep-going*
 	do (format t "~a~%" (process (read-line *query-io*)))))
-
-(main-loop)
