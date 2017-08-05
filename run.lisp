@@ -9,5 +9,8 @@
 (in-package :com.aragaer.pa-brain)
 
 (translator-connect)
-(format t "ready~%")
-(main-loop)
+(format t "~a~%" (translate-pa2human "ready"))
+(handler-case
+ (main-loop)
+ #+sbcl
+ (sb-sys:interactive-interrupt () nil))
