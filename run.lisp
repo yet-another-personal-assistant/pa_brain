@@ -10,6 +10,7 @@
 
 (translator-connect)
 (format t "~a~%" (translate-pa2human "ready"))
+;(cl-user::quit)
 (handler-case
  (main-loop)
  #+sbcl
