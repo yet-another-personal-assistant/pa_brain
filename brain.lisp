@@ -24,7 +24,8 @@
        (cond ,@(mapcar (make-command-case command-var len-var) cases)))))
 
 (defun unknown-command (command)
-  (translate-pa2human (format nil "unknown command \"~a\"" command)))
+  (if (> (length command) 0)
+      (translate-pa2human (format nil "unknown command \"~a\"" command))))
 
 (defmacro just-reply (reply)
   `#'(lambda (arg) (translate-pa2human ,reply)))
@@ -47,4 +48,6 @@
 
 (defun main-loop ()
   (loop while *keep-going*
-	do (format t "~a~%" (process (read-line *query-io*)))))
+	do (let ((message (process (read-line *query-io*))))
+	     (if message
+		 (format t "~a~%" message)))))
