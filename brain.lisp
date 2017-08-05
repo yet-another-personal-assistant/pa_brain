@@ -5,6 +5,7 @@
 (in-package #:com.aragaer.pa-brain)
 
 (defvar *keep-going* t)
+(defvar *top-level-commands* ())
 
 (defun make-command-case (command-var len-var)
   (lambda (one-case)
@@ -16,7 +17,7 @@
 	(let ((,arg-name (subseq ,command-var (min ,len-var ,command-len))))
 	  (funcall ,handler (string-trim " " ,arg-name)))))))
 
-(defmacro command-case (cmd &rest cases)
+(defmacro command-case (cmd cases)
   (let ((command-var (gensym))
 	(len-var (gensym)))
     `(let ((,command-var ,cmd)
@@ -35,16 +36,16 @@
 
 (defun maki-uchi (arg)
   (command-case arg
-		("status" (just-reply "maki-uchi status"))
-		("log" 'maki-uchi-log)))
+		(("status" (just-reply "maki-uchi status"))
+		 ("log" 'maki-uchi-log))))
 
 (defun process (command)
   (command-case command
-		("hello" (just-reply "hello"))
-		("goodbye" (just-reply "goodbye"))
-		("unintelligible" (just-reply "failed to parse"))
-		("maki-uchi" 'maki-uchi)
-		("" 'unknown-command)))
+		(("hello" (just-reply "hello"))
+		 ("goodbye" (just-reply "goodbye"))
+		 ("unintelligible" (just-reply "failed to parse"))
+		 ("maki-uchi" 'maki-uchi)
+		 ("" 'unknown-command))))
 
 (defun main-loop ()
   (loop while *keep-going*
