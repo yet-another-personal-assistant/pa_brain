@@ -9,4 +9,5 @@
 (in-package :com.aragaer.pa-brain)
 
 (translator-connect)
+(format t "ready~%")
 (main-loop)
