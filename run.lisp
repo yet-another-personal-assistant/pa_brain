@@ -8,13 +8,11 @@
 (ql:quickload :trivial-gray-streams)
 
 (load "brain.lisp")
-(load "telegram.lisp")
+
 (in-package :com.aragaer.pa-brain)
 
-(setf *brain-output* (make-instance 'telegram-output-stream))
-(setf *brain-input* (make-instance 'telegram-input-stream))
-
 (translator-connect)
+(brain-accept)
 (brain-output (translate-pa2human "ready"))
 ;(cl-user::quit)
 (handler-case
