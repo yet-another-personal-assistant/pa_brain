@@ -8,14 +8,14 @@
 (defvar *top-level-commands* ())
 
 (defmacro add-command (subset command handler)
-  `(setq ,subset (cons (cons ,command ,handler) ,subset)))
+  `(setq ,subset (acons ,command ,handler ,subset)))
 
 (defun add-top-level-command (command handler)
   (add-command *top-level-commands* command handler))
 
 (defun unknown-command (command)
-  (if (> (length command) 0)
-      (translate-pa2human (format nil "unknown command \"~a\"" command))))
+  (when (> (length command) 0)
+    (translate-pa2human (format nil "unknown command \"~a\"" command))))
 
 (defun starts-with-p (string1 string2)
   (string= string1 string2 :end1 (min (length string1) (length string2))))

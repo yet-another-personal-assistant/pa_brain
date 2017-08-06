@@ -4,12 +4,13 @@
     (load quicklisp-init)))
 
 (ql:quickload :cl-json)
+(ql:quickload :uiop)
 
 (load "brain.lisp")
 (in-package :com.aragaer.pa-brain)
 
 (translator-connect)
-(format t "~a~%" (translate-pa2human "ready"))
+(brain-output (translate-pa2human "ready"))
 ;(cl-user::quit)
 (handler-case
  (main-loop)
