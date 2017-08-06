@@ -1,4 +1,5 @@
 (load "socket.lisp")
+(load "commands.lisp")
 (in-package #:com.aragaer.pa-brain)
 
 (defvar *translator-socket-path* "/tmp/tr_socket")
@@ -20,3 +21,11 @@
 
 (defun translate-human2pa (message &optional (user "user"))
   (translate message user "human2pa"))
+
+(defun translator-refresh (arg)
+  (progn
+    (json:encode-json-plist (list :command "refresh") *translator-io*)
+    (format *translator-io* "~%")
+    (translate-pa2human "done")))
+
+(add-top-level-command "reload phrases" 'translator-refresh)
