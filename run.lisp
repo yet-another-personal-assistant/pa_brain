@@ -5,9 +5,14 @@
 
 (ql:quickload :cl-json)
 (ql:quickload :uiop)
+(ql:quickload :trivial-gray-streams)
 
 (load "brain.lisp")
+(load "telegram.lisp")
 (in-package :com.aragaer.pa-brain)
+
+(setf *brain-output* (make-instance 'telegram-output-stream))
+(setf *brain-input* (make-instance 'telegram-input-stream))
 
 (translator-connect)
 (brain-output (translate-pa2human "ready"))

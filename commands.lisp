@@ -1,4 +1,5 @@
 (load "package.lisp")
+(load "utils.lisp")
 
 (in-package #:com.aragaer.pa-brain)
 
@@ -16,9 +17,6 @@
 (defun unknown-command (command)
   (when (> (length command) 0)
     (translate-pa2human (format nil "unknown command \"~a\"" command))))
-
-(defun starts-with-p (string1 string2)
-  (string= string1 string2 :end1 (min (length string1) (length string2))))
 
 (defun process (command commands)
   (let ((entry (assoc command commands :test 'starts-with-p)))

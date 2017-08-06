@@ -18,11 +18,11 @@
   (format *brain-output* "~a~%" line))
 
 (defun brain-input ()
-  (read-line *brain-input*))
+  (translate-human2pa (read-line *brain-input*)))
 
 (defun brain-output* (line-or-lines)
   (if (listp line-or-lines)
-      (mapcar 'output line-or-lines)
+      (mapcar 'brain-output line-or-lines)
     (brain-output line-or-lines)))
 
 (defun main-loop ()
