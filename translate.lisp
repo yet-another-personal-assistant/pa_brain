@@ -15,7 +15,7 @@
       (list :user user :bot bot :text message)
       *translator-io*)
      (format *translator-io* "~%")
-     (cdr (assoc ':reply (json:decode-json *translator-io*))))
+     (cdr (assoc :reply (json:decode-json *translator-io*))))
    #+sbcl
    (sb-int:simple-stream-error () (progn
 				    (translator-connect)
