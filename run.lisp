@@ -5,11 +5,27 @@
 
 (ql:quickload :cl-json)
 (ql:quickload :uiop)
-(ql:quickload :trivial-gray-streams)
 
 (load "brain.lisp")
+(load "socket.lisp")
 
 (in-package :com.aragaer.pa-brain)
+
+(defun my-command-line ()
+  (or
+   #+CLISP *args*
+   #+SBCL sb-ext:*posix-argv*
+   #+LISPWORKS system:*line-arguments-list*
+   #+CMU extensions:*command-line-words*
+   nil))
+
+(let* ((args (my-command-line))
+       (sock-arg (position "--socket" args :test 'string-equal)))
+  (if sock-arg
+      (progn
+	(setf *brain-socket-path* (elt args (+ sock-arg 1)))
+	(close-socket *brain-socket*)
+	(setf *brain-socket* (create-server-socket *brain-socket-path*)))))
 
 (translator-connect)
 (brain-accept)

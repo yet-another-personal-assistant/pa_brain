@@ -27,3 +27,9 @@
     (sb-bsd-sockets:socket-make-stream remote :input t :output t :buffering :line))
   #-sbcl
   (error "not implemented"))
+
+(defun close-socket (socket)
+  #+sbcl
+  (sb-bsd-sockets:socket-close socket)
+  #-sbcl
+  (error "not implemented"))
