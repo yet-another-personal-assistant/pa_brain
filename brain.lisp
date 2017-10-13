@@ -10,6 +10,7 @@
 (defvar *brain-io* nil)
 (defvar *brain-socket-path* "/tmp/pa_brain")
 (defvar *brain-socket* (create-server-socket *brain-socket-path*))
+(defvar *tg-owner* nil)
 
 (defun brain-accept ()
   (setq *brain-io* (accept-socket-stream *brain-socket*)))
@@ -19,7 +20,7 @@
 (add-top-level-command "unintelligible" (just-reply "failed to parse"))
 
 (defun brain-output (line)
-  (json:encode-json-plist (list :from "pa" :text line) *brain-io*)
+  (json:encode-json-plist (list :from "pa" :text line :chat_id *tg-owner*) *brain-io*)
   (format *brain-io* "~%"))
 
 (defun brain-input ()

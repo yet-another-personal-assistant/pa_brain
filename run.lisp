@@ -20,12 +20,16 @@
    nil))
 
 (let* ((args (my-command-line))
-       (sock-arg (position "--socket" args :test 'string-equal)))
+       (sock-arg (position "--socket" args :test 'string-equal))
+       (owner-arg (position "--tg-owner" args :test 'string-equal)))
   (if sock-arg
       (progn
 	(setf *brain-socket-path* (elt args (+ sock-arg 1)))
 	(close-socket *brain-socket*)
-	(setf *brain-socket* (create-server-socket *brain-socket-path*)))))
+	(setf *brain-socket* (create-server-socket *brain-socket-path*))))
+  (if owner-arg
+      (progn
+	(setf *tg-owner* (elt args (+ owner-arg 1))))))
 
 (translator-connect)
 (brain-accept)
