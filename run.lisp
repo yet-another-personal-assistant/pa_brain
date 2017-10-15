@@ -7,6 +7,8 @@
 (ql:quickload :uiop)
 
 (load "brain.lisp")
+(load "maki-uchi.lisp")
+(load "cron.lisp")
 (load "socket.lisp")
 
 (in-package :com.aragaer.pa-brain)
