@@ -25,7 +25,10 @@
 
 (defun brain-input ()
   (handler-case
-   (translate-human2pa (cdr (assoc :text (json:decode-json *brain-io*))))
+   (let ((message (json:decode-json *brain-io*)))
+     (if (assoc :intent message)
+	 (cdr (assoc :intent message))
+       (translate-human2pa (cdr (assoc :text message)))))
    (end-of-file () (progn
 		     (brain-accept)
 		     (brain-input)))))
