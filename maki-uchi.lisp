@@ -3,6 +3,7 @@
 
 (in-package #:com.aragaer.pa-brain)
 (load "commands.lisp")
+(load "config.lisp")
 
 (defvar *maki-uchi-binary*
   (namestring (merge-pathnames "Projects/maki-uchi/maki-uchi" (user-homedir-pathname))))
@@ -32,3 +33,6 @@
 		     (cons "log" 'maki-uchi-log))))
 
 (add-top-level-command "maki-uchi" 'maki-uchi)
+
+(if *config*
+    (setf *maki-uchi-log-file* (gethash "maki-uchi" *config*)))

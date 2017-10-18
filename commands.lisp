@@ -19,7 +19,6 @@
     (translate-pa2human (format nil "unknown command \"~a\"" command))))
 
 (defun process (command commands)
-  (let ((entry (assoc command commands :test 'starts-with-p)))
-    (if entry
-	(funcall (cdr entry) (string-trim " " (subseq command (length (car entry)))))
-      (unknown-command command))))
+  (aif (assoc command commands :test 'starts-with-p)
+       (funcall (cdr it) (string-trim " " (subseq command (length (car it)))))
+       (unknown-command command)))

@@ -2,18 +2,13 @@
 
 (load "translate.lisp")
 (load "commands.lisp")
-(load "socket.lisp")
+(load "connect.lisp")
+(load "utils.lisp")
 
 (in-package #:com.aragaer.pa-brain)
 
 (defvar *keep-going* t)
-(defvar *brain-io* nil)
-(defvar *brain-socket-path* "/tmp/pa_brain")
-(defvar *brain-socket* (create-server-socket *brain-socket-path*))
 (defvar *tg-owner* nil)
-
-(defun brain-accept ()
-  (setq *brain-io* (accept-socket-stream *brain-socket*)))
 
 (add-top-level-command "hello" (just-reply "hello"))
 (add-top-level-command "goodbye" (just-reply "goodbye"))
@@ -26,9 +21,9 @@
 (defun brain-input ()
   (handler-case
    (let ((message (json:decode-json *brain-io*)))
-     (if (assoc :intent message)
-	 (cdr (assoc :intent message))
-       (translate-human2pa (cdr (assoc :text message)))))
+     (aif (assoc :intent message)
+	  (cdr it)
+	  (translate-human2pa (cdr (assoc :text message)))))
    (end-of-file () (progn
 		     (brain-accept)
 		     (brain-input)))))
@@ -39,5 +34,8 @@
     (brain-output line-or-lines)))
 
 (defun main-loop ()
-  (loop while *keep-going*
-	do (brain-output* (process (brain-input) *top-level-commands*))))
+  (progn
+    (translator-connect)
+    (brain-accept)
+    (loop while *keep-going*
+	  do (brain-output* (process (brain-input) *top-level-commands*)))))
