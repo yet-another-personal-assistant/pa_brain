@@ -7,8 +7,7 @@
 
 (defvar *maki-uchi-binary*
   (namestring (merge-pathnames "Projects/maki-uchi/maki-uchi" (user-homedir-pathname))))
-(defvar *maki-uchi-log-file*
-  (namestring (merge-pathnames "Dropbox/maki-uchi.log" (user-homedir-pathname))))
+(defvar *maki-uchi-log-file* nil)
 
 (defun maki-uchi-translate (message)
   (translate-pa2human (format nil "makiuchi ~a" message)))
@@ -34,5 +33,4 @@
 
 (add-top-level-command "maki-uchi" 'maki-uchi)
 
-(if *config*
-    (setf *maki-uchi-log-file* (gethash "maki-uchi" *config*)))
+(if *config* (setf *maki-uchi-log-file* (gethash "maki-uchi" *config*)))
