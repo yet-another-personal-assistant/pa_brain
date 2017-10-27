@@ -11,9 +11,6 @@
 
 (load "brain.lisp")
 (load "cron.lisp")
-(load "socket.lisp")
-(load "utils.lisp")
-(load "connect.lisp")
 
 (in-package :com.aragaer.pa-brain)
 
