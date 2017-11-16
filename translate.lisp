@@ -1,5 +1,6 @@
 (load "socket.lisp")
 (load "commands.lisp")
+(load "utils.lisp")
 (in-package #:com.aragaer.pa-brain)
 
 (defvar *translator-socket-path* "/tmp/tr_socket")
@@ -15,7 +16,7 @@
       (list :user user :bot bot :text message)
       *translator-io*)
      (format *translator-io* "~%")
-     (cdr (assoc :reply (json:decode-json *translator-io*))))
+     (assoc-value :reply (json:decode-json *translator-io*)))
    #+sbcl
    (sb-int:simple-stream-error () (progn
 				    (translator-connect)
@@ -28,9 +29,8 @@
   (translate message user "human2pa"))
 
 (defun translator-refresh (arg)
-  (progn
-    (json:encode-json-plist (list :command "refresh") *translator-io*)
-    (format *translator-io* "~%")
-    (translate-pa2human "done")))
+  (json:encode-json-plist (list :command "refresh") *translator-io*)
+  (format *translator-io* "~%")
+  (translate-pa2human "done"))
 
 (add-top-level-command "reload phrases" 'translator-refresh)

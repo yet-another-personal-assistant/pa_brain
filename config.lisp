@@ -1,6 +1,6 @@
 (load "package.lisp")
 (load "connect.lisp")
-(load "brain.lisp")
+(load "utils.lisp")
 
 (in-package :com.aragaer.pa-brain)
 
@@ -21,14 +21,15 @@
      (when value ,@body)))
 
 (defun process-config ()
-  (progn
-    (with-arg "--socket" (setf *brain-socket-path* value))
-    (with-arg "--config" (setf *config* (yaml:parse (uiop:read-file-string value))))
-    (with-arg "--tg-owner" (setf *tg-owner* value)) ; TODO: drop this parameter
+  (with-arg "--socket" (setf *brain-socket-path* value))
+  (with-arg "--config" (setf *config* (yaml:parse (uiop:read-file-string value))))
 
-    (when *config*
-      (setf *tg-owner* (gethash "telegram" *config*))
-      (aif (gethash "modules" *config*)
-	   (loop for module in it
-		 do (format t "; Loading \"~a\"~%" module)
-		 do (load (format nil "~a.lisp" module)))))))
+  (when *config*
+    (print-hash *standard-output* *config*)
+    (aif (gethash "modules" *config*)
+	 (loop for module in it
+	       do (format t "; Loading \"~a\"~%" module)
+	       do (load (format nil "~a.lisp" module))))))
+
+(defun get-telegram-id ()
+  (gethash "telegram" *config*))

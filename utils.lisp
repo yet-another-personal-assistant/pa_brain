@@ -18,3 +18,6 @@
     (if present
       (format t "Value ~a actually present.~%" value)
       (format t "Value ~a because key not found.~%" value))))
+
+(defun assoc-value (key alist)
+  (cdr (assoc key alist)))
