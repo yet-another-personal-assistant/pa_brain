@@ -5,12 +5,12 @@
 (load "connect.lisp")
 (load "config.lisp")
 (load "utils.lisp")
+(load "state.lisp")
 
 (in-package #:com.aragaer.pa-brain)
 
 (defvar *keep-going* t)
 
-(add-top-level-command "hello" (just-reply "hello"))
 (add-top-level-command "goodbye" (just-reply "goodbye"))
 (add-top-level-command "unintelligible" (just-reply "failed to parse"))
 
@@ -39,7 +39,9 @@
 		     (brain-input)))))
 
 (defun brain-output (line target)
-  (json:encode-json-plist (append (list :from "pa" :text line) target) *brain-io*)
+  (json:encode-json-plist (append (list :from "pa"
+					:text (translate-pa2human line))
+				  target) *brain-io*)
   (format *brain-io* "~%"))
 
 (defun brain-output* (line-or-lines target)
@@ -48,11 +50,13 @@
 	    do (brain-output line target))
     (brain-output line-or-lines target)))
 
+(add-handler (make-instance 'old-handler))
+
 (defun main-loop ()
   (translator-connect)
   (brain-accept)
   (loop while *keep-going*
 	with message
 	do (setq message (brain-input))
-	do (brain-output* (process (get-intent message) *top-level-commands*)
+	do (brain-output* (try-handle (get-intent message))
 			  (build-target message))))

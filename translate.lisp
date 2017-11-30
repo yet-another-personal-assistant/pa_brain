@@ -31,6 +31,6 @@
 (defun translator-refresh (arg)
   (json:encode-json-plist (list :command "refresh") *translator-io*)
   (format *translator-io* "~%")
-  (translate-pa2human "done"))
+  "done")
 
 (add-top-level-command "reload phrases" 'translator-refresh)

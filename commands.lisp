@@ -5,7 +5,7 @@
 (in-package #:com.aragaer.pa-brain)
 
 (defmacro just-reply (reply)
-  `#'(lambda (arg) (translate-pa2human ,reply)))
+  `#'(lambda (arg) ,reply))
 
 (defvar *top-level-commands* ())
 
@@ -17,9 +17,18 @@
 
 (defun unknown-command (command)
   (when (> (length command) 0)
-    (translate-pa2human (format nil "unknown command \"~a\"" command))))
+    (format nil "unknown command \"~a\"" command)))
 
 (defun process (command commands)
   (aif (assoc command commands :test 'starts-with-p)
        (funcall (cdr it) (string-trim " " (subseq command (length (car it)))))
        (unknown-command command)))
+
+(defclass old-handler (handler)
+  ())
+
+(defmethod handles-p ((handler old-handler) trigger)
+  (assoc trigger *top-level-commands* :test 'starts-with-p))
+
+(defmethod handle ((handler old-handler) message)
+  (process message *top-level-commands*))

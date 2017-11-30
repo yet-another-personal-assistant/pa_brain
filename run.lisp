@@ -11,10 +11,14 @@
 
 (load "brain.lisp")
 (load "cron.lisp")
+(load "state.lisp")
+(load "greeter.lisp")
 
 (in-package :com.aragaer.pa-brain)
 
 (process-config)
+
+(add-handler (make-instance 'greeter))
 (handler-case
  (main-loop)
  #+sbcl
