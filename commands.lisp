@@ -1,5 +1,6 @@
 (load "package.lisp")
 (load "utils.lisp")
+(load "state.lisp")
 
 (in-package #:com.aragaer.pa-brain)
 
