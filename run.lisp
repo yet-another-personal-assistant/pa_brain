@@ -3,9 +3,11 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
-(ql:quickload :cl-json)
-(ql:quickload :uiop)
-(ql:quickload :cl-yaml)
+(with-open-file (*standard-output* "/dev/null" :direction :output
+                                   :if-exists :supersede)
+		(ql:quickload :cl-json)
+		(ql:quickload :uiop)
+		(ql:quickload :cl-yaml))
 
 (load "config.lisp")
 

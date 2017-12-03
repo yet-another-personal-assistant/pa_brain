@@ -25,7 +25,6 @@
   (with-arg "--config" (setf *config* (yaml:parse (uiop:read-file-string value))))
 
   (when *config*
-    (print-hash *standard-output* *config*)
     (aif (gethash "modules" *config*)
 	 (loop for module in it
 	       do (format t "; Loading \"~a\"~%" module)
