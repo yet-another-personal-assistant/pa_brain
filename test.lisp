@@ -3,7 +3,9 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
-(ql:quickload :prove)
+(with-open-file (*standard-output* "/dev/null" :direction :output
+				   :if-exists :supersede)
+		(ql:quickload :prove))
 
 (prove:run #P"tests/state.lisp" :reporter :list)
 (prove:run #P"tests/greeter.lisp" :reporter :list)

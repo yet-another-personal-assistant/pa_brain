@@ -1,6 +1,7 @@
 (load "package.lisp")
 (load "utils.lisp")
 (load "state.lisp")
+(load "event.lisp")
 
 (in-package #:com.aragaer.pa-brain)
 
@@ -19,16 +20,16 @@
   (when (> (length command) 0)
     (format nil "unknown command \"~a\"" command)))
 
-(defun process (command commands)
+(defun process-command (command commands)
   (aif (assoc command commands :test 'starts-with-p)
        (funcall (cdr it) (string-trim " " (subseq command (length (car it)))))
        (unknown-command command)))
 
-(defclass old-handler (handler)
+(defclass old-handler (thought)
   ())
 
-(defmethod handles-p ((handler old-handler) trigger)
-  (assoc trigger *top-level-commands* :test 'starts-with-p))
+(defmethod react ((thought old-handler) event))
 
-(defmethod handle ((handler old-handler) message)
-  (process message *top-level-commands*))
+(defmethod process ((thought old-handler) event)
+  (if (not (or (getf event :modifiers) (getf event :response)))
+      (add-response event (process-command (getf event :intent) *top-level-commands*))))

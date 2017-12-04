@@ -2,22 +2,19 @@
 
 (in-package #:com.aragaer.pa-brain)
 
-(defvar *handlers* ())
+(defvar *thoughts* ())
 
-(defclass handler ()
+(defclass thought ()
   ())
 
-(defgeneric handles-p (handler trigger))
-(defgeneric handle (handler message))
-(defgeneric reset (handler))
+(defgeneric react (thought event))
+(defgeneric process (thought event))
 
-(defun try-handle (message)
-  (loop for handler in *handlers*
-	when (handles-p handler message)
-	append (let ((result (handle handler message)))
-		 (if (listp result)
-		     result
-		   (list result)))))
+(defun try-handle (event)
+  (loop for thought in *thoughts*
+	do (react thought event))
+  (loop for thought in *thoughts*
+	do (process thought event)))
 
-(defun add-handler (handler)
-  (push handler *handlers*))
+(defun add-thought (thought)
+  (push thought *thoughts*))

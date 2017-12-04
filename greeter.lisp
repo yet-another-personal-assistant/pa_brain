@@ -3,18 +3,18 @@
 
 (in-package #:com.aragaer.pa-brain)
 
-(defclass greeter (handler)
+(defclass greeter (thought)
   ((seen :initform nil)))
 
-(defmethod handles-p ((handler greeter) trigger)
-  (string-equal trigger "hello"))
+(defmethod react ((thought greeter) event)
+  (with-slots (seen) thought
+    (cond ((not seen) (add-modifier event :hello))
+	  ((string-equal (getf event :intent) "hello") (add-modifier event :seen-already)))
+    (setq seen t)))
 
-(defmethod handle ((handler greeter) message)
-  (with-slots (seen) handler
-    (let ((result (if seen "seen already" "hello")))
-      (setq seen t)
-      result)))
+(defmethod process ((thought greeter) event)
+  (cond ((get-modifier event :hello) (setf (getf event :response)
+					   (push "hello" (getf event :response))))
+	((get-modifier event :seen-already) (setf (getf event :response)
+						  (push "seen already" (getf event :response))))))
 
-(defmethod reset ((handler greeter))
-  (with-slots (seen) handler
-    (setq seen nil)))

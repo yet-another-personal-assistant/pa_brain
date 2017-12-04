@@ -1,33 +1,31 @@
 (in-package :cl-user)
-
 (load #P"state.lisp")
+(load #P"event.lisp")
 
-(in-package #:com.aragaer.pa-brain)
-(use-package :prove)
+(defpackage state-test
+  (:use :cl
+	:prove
+	:com.aragaer.pa-brain))
 
-(defclass my-handler (handler)
-  ((messages :initarg :messages)
-   (triggers :initarg :triggers)))
-
-(defmethod handles-p ((handler my-handler) trigger)
-  (member trigger (slot-value handler 'triggers) :test 'string-equal))
-
-(defvar *calls* (list))
-
-(defmethod handle ((handler my-handler) message)
-  (push message *calls*)
-  (slot-value handler 'messages))
+(in-package #:state-test)
+(load #P"test-utils.lisp")
 
 (plan nil)
-(subtest "Add handler"
-	 (add-handler (make-instance 'my-handler
-				     :messages "yo"
+(subtest "Add thought"
+	 (add-thought (make-instance 'test-thought
+				     :messages '("yo")
 				     :triggers '("test" "ping")))
-	 (add-handler (make-instance 'my-handler
+	 (add-thought (make-instance 'test-thought
 				     :messages '("hi" "there")
 				     :triggers '("ping")))
-	 (is (try-handle "test") '("yo"))
-	 (is (try-handle "ping") '("hi" "there" "yo"))
-	 (ok (not (try-handle "hi"))))
+	 (let ((event1 (make-event-from-intent "test"))
+	       (event2 (make-event-from-intent "ping"))
+	       (event3 (make-event-from-intent "hi")))
+	   (try-handle event1)
+	   (try-handle event2)
+	   (try-handle event3)
+	   (is (getf event1 :response) '("yo"))
+	   (is (getf event2 :response) '("hi" "there" "yo"))
+	   (is (getf event3 :response) nil)))
 
 (finalize)

@@ -2,6 +2,6 @@ all:
 	echo "umm"
 
 test:
-	sbcl --load test.lisp --eval '(quit)'
+	sbcl --noinform --load test.lisp --eval '(quit)'
 
 .PHONY: all test

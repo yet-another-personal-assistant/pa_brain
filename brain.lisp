@@ -6,6 +6,7 @@
 (load "config.lisp")
 (load "utils.lisp")
 (load "state.lisp")
+(load "event.lisp")
 
 (in-package #:com.aragaer.pa-brain)
 
@@ -50,7 +51,7 @@
 	    do (brain-output line target))
     (brain-output line-or-lines target)))
 
-(add-handler (make-instance 'old-handler))
+(add-thought (make-instance 'old-handler))
 
 (defun main-loop ()
   (translator-connect)
@@ -58,5 +59,8 @@
   (loop while *keep-going*
 	with message
 	do (setq message (brain-input))
-	do (brain-output* (try-handle (get-intent message))
+	with event
+	do (setq event (make-event (get-intent message) nil nil))
+	do (try-handle event)
+	do (brain-output* (getf event :response)
 			  (build-target message))))

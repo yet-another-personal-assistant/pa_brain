@@ -20,7 +20,7 @@
 
 (process-config)
 
-(add-handler (make-instance 'greeter))
+(add-thought (make-instance 'greeter))
 (handler-case
  (main-loop)
  #+sbcl
