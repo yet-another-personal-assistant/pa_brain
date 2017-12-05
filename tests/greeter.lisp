@@ -4,6 +4,7 @@
 (defpackage greeter-test
   (:use :cl
 	:prove
+	:cl-mock
 	:com.aragaer.pa-brain))
 
 (in-package #:greeter-test)
@@ -15,10 +16,8 @@
 	       (event2 (make-event-from-intent "goodbye")))
 	   (react (make-instance 'greeter) event1)
 	   (react (make-instance 'greeter) event2)
-	   (ok (assoc-value :hello (getf event1 :modifiers)))
-	   (ok (not (assoc-value :seen-already (getf event1 :modifiers))))
-	   (ok (assoc-value :hello (getf event1 :modifiers)))
-	   (ok (not (assoc-value :seen-already (getf event1 :modifiers))))))
+	   (is (getf event1 :modifiers) (acons :hello t nil))
+	   (is (getf event2 :modifiers) (acons :hello t nil))))
 
 (subtest "Greeter react"
 	 (let ((a-greeter (make-instance 'greeter))
@@ -26,10 +25,8 @@
 	       (event2 (make-event-from-intent "hello")))
 	   (react a-greeter event1)
 	   (react a-greeter event2)
-	   (ok (assoc-value :hello (getf event1 :modifiers)))
-	   (ok (not (assoc-value :seen-already (getf event1 :modifiers))))
-	   (ok (not (assoc-value :hello (getf event2 :modifiers))))
-	   (ok (assoc-value :seen-already (getf event2 :modifiers)))))
+	   (is (getf event1 :modifiers) (acons :hello t nil))
+	   (is (getf event2 :modifiers) (acons :seen-already t nil))))
 
 (subtest "Greeter react 2"
 	 (let ((a-greeter (make-instance 'greeter))
@@ -37,10 +34,8 @@
 	       (event2 (make-event-from-intent "goodbye")))
 	   (react a-greeter event1)
 	   (react a-greeter event2)
-	   (ok (assoc-value :hello (getf event1 :modifiers)))
-	   (ok (not (assoc-value :seen-already (getf event1 :modifiers))))
-	   (ok (not (assoc-value :hello (getf event2 :modifiers))))
-	   (ok (not (assoc-value :seen-already (getf event2 :modifiers))))))
+	   (is (getf event1 :modifiers) (acons :hello t nil))
+	   (is (getf event2 :modifiers) nil)))
 
 (subtest "Greeter process"
 	 (let ((a-greeter (make-instance 'greeter))
@@ -71,10 +66,27 @@
 	   (is (getf event2 :response) '("seen already" "yo"))
 	   (is (getf event3 :response) '("yo"))))
 
-;(subtest "Greeter timeout"
-;	 (let ((a-greeter (make-instance 'greeter))
-;	       (event1 (make-event-from-intent "hello"))
-;					    (this-time (get-universal-time)))
-;	   (react a-greeter event1)))
+(defmacro with-unlock (&rest body)
+  #+sbcl
+  `(sb-ext:with-unlocked-packages ("COMMON-LISP") ,@body)
+  #-sbcl
+  `(progn ,@body))
+
+(subtest "Greeter timeout"
+	 (let ((a-greeter (make-instance 'greeter))
+	       (event1 (make-event-from-intent "hello"))
+	       (event2 (make-event-from-intent "hello"))
+	       (event3 (make-event-from-intent "hello"))
+	       (this-time (get-universal-time)))
+	   (with-unlock
+	    (dflet ((get-universal-time () this-time))
+		   (react a-greeter event1))
+	    (dflet ((get-universal-time () (+ this-time (* 5 60))))
+		   (react a-greeter event2))
+	    (dflet ((get-universal-time () (+ this-time (* 21 60 60))))
+		   (react a-greeter event3)))
+	   (is (getf event1 :modifiers) (acons :hello t nil))
+	   (is (getf event2 :modifiers) (acons :seen-already t nil))
+	   (is (getf event3 :modifiers) (acons :hello t nil))))
 
 (finalize)

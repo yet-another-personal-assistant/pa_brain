@@ -3,14 +3,16 @@
 
 (in-package #:com.aragaer.pa-brain)
 
+(defparameter *greet-timeout* (* 20 60 60))
+
 (defclass greeter (thought)
-  ((seen :initform nil)))
+  ((last-seen :initform 0)))
 
 (defmethod react ((thought greeter) event)
-  (with-slots (seen) thought
-    (cond ((not seen) (add-modifier event :hello))
+  (with-slots (last-seen) thought
+    (cond ((< (+ last-seen *greet-timeout*) (get-universal-time)) (add-modifier event :hello))
 	  ((string-equal (getf event :intent) "hello") (add-modifier event :seen-already)))
-    (setq seen t)))
+    (setq last-seen (get-universal-time))))
 
 (defmethod process ((thought greeter) event)
   (cond ((get-modifier event :hello) (setf (getf event :response)
