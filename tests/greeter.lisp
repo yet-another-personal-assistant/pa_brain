@@ -89,4 +89,23 @@
 	   (is (getf event2 :modifiers) (acons :seen-already t nil))
 	   (is (getf event3 :modifiers) (acons :hello t nil))))
 
+(subtest "Greeter persistence"
+	 (let ((a-greeter (make-instance 'greeter))
+	       (event1 (make-event-from-intent "hello"))
+	       (event2 (make-event-from-intent "hello"))
+	       (event3 (make-event-from-intent "hello"))
+	       (this-time (get-universal-time)))
+	   (with-unlock
+	    (dflet ((get-universal-time () this-time))
+		   (react a-greeter event1))
+	    (let ((serialized (conspack:encode a-greeter)))
+	      (setf a-greeter (conspack:decode serialized)))
+	    (dflet ((get-universal-time () (+ this-time (* 5 60))))
+		   (react a-greeter event2))
+	    (dflet ((get-universal-time () (+ this-time (* 21 60 60))))
+		   (react a-greeter event3)))
+	   (is (getf event1 :modifiers) (acons :hello t nil))
+	   (is (getf event2 :modifiers) (acons :seen-already t nil))
+	   (is (getf event3 :modifiers) (acons :hello t nil))))
+
 (finalize)

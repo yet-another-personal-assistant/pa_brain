@@ -20,3 +20,5 @@
 	((get-modifier event :seen-already) (setf (getf event :response)
 						  (push "seen already" (getf event :response))))))
 
+(conspack:defencoding greeter
+		      last-seen)
