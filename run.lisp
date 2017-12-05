@@ -6,6 +6,7 @@
 (with-open-file (*standard-output* "/dev/null" :direction :output
                                    :if-exists :supersede)
 		(ql:quickload :cl-conspack)
+		(ql:quickload :exit-hooks)
 		(ql:quickload :cl-json)
 		(ql:quickload :uiop)
 		(ql:quickload :cl-yaml))

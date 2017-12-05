@@ -9,6 +9,7 @@
 
 (defun brain-accept ()
   (when *brain-socket-path*
+    (exit-hooks:add-exit-hook #'(lambda () (delete-file *brain-socket-path*)))
     (if (not *brain-socket*)
 	(setf *brain-socket* (create-server-socket *brain-socket-path*)))
     (setq *brain-io* (accept-socket-stream *brain-socket*))))
