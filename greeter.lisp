@@ -1,12 +1,14 @@
 (load "package.lisp")
 (load "state.lisp")
+(load "event.lisp")
 
 (in-package #:com.aragaer.pa-brain)
 
 (defparameter *greet-timeout* (* 20 60 60))
 
 (defclass greeter (thought)
-  ((last-seen :initform 0)))
+  ((name :initform :greeter)
+   (last-seen :initform 0)))
 
 (defmethod react ((thought greeter) event)
   (with-slots (last-seen) thought
@@ -21,4 +23,4 @@
 						  (push "seen already" (getf event :response))))))
 
 (conspack:defencoding greeter
-		      last-seen)
+		      name last-seen)

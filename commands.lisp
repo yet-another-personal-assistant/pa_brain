@@ -26,7 +26,10 @@
        (unknown-command command)))
 
 (defclass old-handler (thought)
-  ())
+  ((name :initform :old)))
+
+(conspack:defencoding old-handler
+		      name)
 
 (defmethod react ((thought old-handler) event))
 

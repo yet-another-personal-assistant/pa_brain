@@ -22,7 +22,11 @@
 
 (process-config)
 
-(add-thought (make-instance 'greeter))
+(add-default-thought :greeter #'(lambda () (make-instance 'greeter)))
+(add-default-thought :old #'(lambda () (make-instance 'old-handler)))
+
+(init-thoughts)
+
 (handler-case
  (main-loop)
  #+sbcl

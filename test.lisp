@@ -7,7 +7,9 @@
 				   :if-exists :supersede)
 		(ql:quickload :cl-conspack)
 		(ql:quickload :cl-mock)
+		(ql:quickload :cl-yaml)
+		(ql:quickload :exit-hooks)
 		(ql:quickload :prove))
 
-(prove:run #P"tests/state.lisp" :reporter :list)
 (prove:run #P"tests/greeter.lisp" :reporter :list)
+(prove:run #P"tests/state.lisp" :reporter :list)

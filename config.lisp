@@ -14,6 +14,7 @@
 
 (defvar *argv* (my-command-line))
 (defvar *config* nil)
+(defvar *saved-file* nil)
 
 (defmacro with-arg (key &rest body)
   `(let* ((pos (position ,key *argv* :test 'string-equal))
@@ -23,6 +24,7 @@
 (defun process-config ()
   (with-arg "--socket" (setf *brain-socket-path* value))
   (with-arg "--config" (setf *config* (yaml:parse (uiop:read-file-string value))))
+  (with-arg "--saved" (setf *saved-file* value))
 
   (when *config*
     (aif (gethash "modules" *config*)

@@ -17,3 +17,6 @@
 
 (defun assoc-value (key alist)
   (cdr (assoc key alist)))
+
+(conspack:defencoding test-thought
+		      messages triggers)
