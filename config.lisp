@@ -15,6 +15,7 @@
 (defvar *argv* (my-command-line))
 (defvar *config* nil)
 (defvar *saved-file* nil)
+(defvar *translator-socket-path* "/tmp/tr_socket")
 
 (defmacro with-arg (key &rest body)
   `(let* ((pos (position ,key *argv* :test 'string-equal))
@@ -25,6 +26,7 @@
   (with-arg "--socket" (setf *brain-socket-path* value))
   (with-arg "--config" (setf *config* (yaml:parse (uiop:read-file-string value))))
   (with-arg "--saved" (setf *saved-file* value))
+  (with-arg "--translator" (setf *translator-socket-path* value))
 
   (when *config*
     (aif (gethash "modules" *config*)

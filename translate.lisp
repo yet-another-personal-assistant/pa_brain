@@ -1,9 +1,9 @@
 (load "socket.lisp")
 (load "commands.lisp")
 (load "utils.lisp")
+(load "config.lisp")
 (in-package #:com.aragaer.pa-brain)
 
-(defvar *translator-socket-path* "/tmp/tr_socket")
 (defvar *translator-io* nil)
 
 (defun translator-connect (&optional (socket-path *translator-socket-path*))
