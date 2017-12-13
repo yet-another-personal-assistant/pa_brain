@@ -28,8 +28,8 @@
     (append '("good") (maki-uchi-translate (get-maki-uchi-status-lines)))))
 
 (defun maki-uchi (arg)
-  (process arg (list (cons "status" 'maki-uchi-status)
-		     (cons "log" 'maki-uchi-log))))
+  (process-command arg (list (cons "status" 'maki-uchi-status)
+			     (cons "log" 'maki-uchi-log))))
 
 (add-top-level-command "maki-uchi" 'maki-uchi)
 
