@@ -21,3 +21,8 @@
 
 (defun assoc-value (key alist)
   (cdr (assoc key alist)))
+
+(defmacro ensure-list (list-or-value)
+  `(if (listp ,list-or-value)
+       (alexandria:flatten ,list-or-value)
+     (list ,list-or-value)))

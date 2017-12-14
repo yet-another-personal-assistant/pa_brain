@@ -39,17 +39,10 @@
 		     (brain-accept)
 		     (brain-input)))))
 
-(defun brain-output (line target)
-  (json:encode-json-plist (append (list :from "pa"
-					:text (translate-pa2human line))
-				  target) *brain-io*)
-  (format *brain-io* "~%"))
-
-(defun brain-output* (line-or-lines target)
-  (if (listp line-or-lines)
-      (loop for line in line-or-lines
-	    do (brain-output line target))
-    (brain-output line-or-lines target)))
+(defun brain-output (lines target)
+  (let ((messages (mapcar 'translate-pa2human lines)))
+    (json:encode-json-plist (append `(:from "pa" :text ,messages) target) *brain-io*)
+    (format *brain-io* "~%")))
 
 (add-thought (make-instance 'old-handler))
 
@@ -62,5 +55,5 @@
 	with event
 	do (setq event (make-event (get-intent message) nil nil))
 	do (try-handle event)
-	do (brain-output* (getf event :response)
-			  (build-target message))))
+	do (brain-output (ensure-list (getf event :response))
+			 (build-target message))))

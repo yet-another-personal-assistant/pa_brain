@@ -5,6 +5,7 @@
 
 (with-open-file (*standard-output* "/dev/null" :direction :output
 				   :if-exists :supersede)
+		(ql:quickload :alexandria)
 		(ql:quickload :cl-conspack)
 		(ql:quickload :cl-mock)
 		(ql:quickload :cl-yaml)
