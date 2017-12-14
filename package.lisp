@@ -9,4 +9,5 @@
 	   :save-state
 	   :react
 	   :process
-	   :greeter))
+	   :greeter
+	   :japanese-reminder))

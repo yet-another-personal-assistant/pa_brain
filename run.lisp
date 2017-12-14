@@ -17,10 +17,16 @@
 (load "cron.lisp")
 (load "state.lisp")
 (load "greeter.lisp")
+(load "utils.lisp")
 
 (in-package :com.aragaer.pa-brain)
 
 (process-config)
+
+(aif (gethash "modules" *config*)
+     (progn
+       (when (member "japanese" it :test 'string-equal)
+	 (add-default-thought :japanese-reminder #'(lambda () (make-instance 'japanese-reminder))))))
 
 (add-default-thought :greeter #'(lambda () (make-instance 'greeter)))
 (add-default-thought :old #'(lambda () (make-instance 'old-handler)))

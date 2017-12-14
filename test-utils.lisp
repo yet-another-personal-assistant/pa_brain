@@ -1,8 +1,10 @@
 (defun event-intent-equal-p (event text)
   (string-equal (getf event :intent) text))
 
-(defun make-event-from-intent (intent)
-  (make-event intent nil nil))
+(defun make-event-from-intent (intent &optional modifiers)
+  (let ((result (make-event intent nil nil)))
+    (setf (getf result :modifiers) modifiers)
+    result))
 
 (defclass test-thought (thought)
   ((messages :initarg :messages)
@@ -20,3 +22,9 @@
 
 (conspack:defencoding test-thought
 		      messages triggers)
+
+(defmacro with-unlock (&rest body)
+  #+sbcl
+  `(sb-ext:with-unlocked-packages ("COMMON-LISP") ,@body)
+  #-sbcl
+  `(progn ,@body))

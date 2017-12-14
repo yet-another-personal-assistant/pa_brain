@@ -11,5 +11,9 @@
 		(ql:quickload :exit-hooks)
 		(ql:quickload :prove))
 
-(prove:run #P"tests/greeter.lisp" :reporter :list)
-(prove:run #P"tests/state.lisp" :reporter :list)
+(if (and
+     (prove:run #P"tests/greeter.lisp" :reporter :list)
+     (prove:run #P"tests/state.lisp" :reporter :list)
+     (prove:run #P"tests/japanese.lisp" :reporter :list))
+    (format t "PASSED~%")
+  (format t "FAILED~%"))

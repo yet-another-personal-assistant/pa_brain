@@ -66,12 +66,6 @@
 	   (is (getf event2 :response) '("seen already" "yo"))
 	   (is (getf event3 :response) '("yo"))))
 
-(defmacro with-unlock (&rest body)
-  #+sbcl
-  `(sb-ext:with-unlocked-packages ("COMMON-LISP") ,@body)
-  #-sbcl
-  `(progn ,@body))
-
 (subtest "Greeter timeout"
 	 (let ((a-greeter (make-instance 'greeter))
 	       (event1 (make-event-from-intent "hello"))
