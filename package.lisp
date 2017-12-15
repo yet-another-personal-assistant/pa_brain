@@ -10,4 +10,5 @@
 	   :react
 	   :process
 	   :greeter
-	   :japanese-reminder))
+	   :japanese-reminder
+	   :dialog))
