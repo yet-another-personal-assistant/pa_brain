@@ -7,10 +7,17 @@
 (defvar *default-thoughts* nil)
 
 (defclass thought ()
-  ((name :initarg :name)))
+  ((name :initarg :name)
+   (finished :initform nil)))
 
 (defgeneric react (thought event))
 (defgeneric process (thought event))
+
+(defun finished-p (thought)
+  (slot-value thought 'finished))
+
+(defun mark-finished (thought &optional (value t))
+  (setf (slot-value thought 'finished) value))
 
 (defun try-handle (event)
   (loop for thought in *thoughts*

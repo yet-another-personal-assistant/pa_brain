@@ -1,6 +1,7 @@
 (load "package.lisp")
 (load "state.lisp")
 (load "event.lisp")
+(load "dialog.lisp")
 
 (in-package #:com.aragaer.pa-brain)
 
@@ -11,7 +12,26 @@
   ((name :initform :japanese-reminder)
    (tasks :initform nil)
    (done :initform 0)
-   (status-requested :initform nil)))
+   (status-requested :initform nil)
+   (dialog :initform nil)))
+
+(defun mark-as-done (thought &optional (what *tasks*))
+  (with-slots (done tasks) thought
+    (setf done (get-universal-time))
+    (setf tasks (append (ensure-list what) tasks))))
+
+(defmacro japanese-dialog-result (is-done)
+  `#'(lambda (thought event data)
+       (declare (ignore data))
+       ,(if is-done '(mark-as-done habit))
+       (mark-finished thought)
+       (add-modifier event :japanese-done ,is-done)))
+
+(defun make-japanese-dialog (habit)
+  (make-instance 'dialog
+		 :name :japanese-dialog
+		 :triggers (acons "yes" (japanese-dialog-result t)
+				  (acons "no" (japanese-dialog-result nil) nil))))
 
 (defun japanese-request-status (thought event)
   (with-slots (done tasks status-requested) thought
@@ -21,33 +41,23 @@
 			  unless (member task tasks :test 'string-equal)
 			  collect task)))
       (add-modifier event :japanese-request (or (not tasks) not-done))
-      (setf status-requested (not (null not-done))))))
-
-(defun mark-as-done (thought &optional (what *tasks*))
-  (with-slots (done tasks) thought
-    (setf done (get-universal-time))
-    (setf tasks (append (ensure-list what) tasks))))
+      (not (null not-done)))))
 
 (defmethod react ((thought japanese-reminder) event)
-  (with-slots (done tasks status-requested) thought
-    (let ((intent (getf event :intent)))
+  (with-slots (dialog) thought
+    (if dialog (react dialog event))
+    (let ((intent (getf event :intent))
+	  (need-dialog nil))
       (cond ((starts-with-p intent "japanese report")
-	     (setf status-requested nil)
 	     (let ((what (string-trim " " (subseq intent (length "japanese report")))))
 	       (mark-as-done thought (if (string-equal what "done") *tasks* what)))
 	     (add-modifier event :japanese-done))
 	    ((string-equal intent "cron study japanese")
-	     (japanese-request-status thought event))
-	    ((and (string-equal intent "yes")
-		  status-requested)
-	     (mark-as-done thought *tasks*)
-	     (add-modifier event :japanese-done)
-	     (setf status-requested nil))
-	    ((and (string-equal intent "no")
-		  status-requested)
-	     (add-modifier event :japanese-done nil)
-	     (setf status-requested nil))))))
-
+	     (setf need-dialog (japanese-request-status thought event))))
+      (if (and need-dialog (not dialog))
+	  (setf dialog (make-japanese-dialog thought)))
+      (if (and dialog (not need-dialog))
+	  (setf dialog nil)))))
 
 (defmethod process ((thought japanese-reminder) event)
   (cond ((get-modifier event :japanese-done)
@@ -62,4 +72,4 @@
 	 (setf (getf event :response) (push "bad" (getf event :response))))))
 
 (conspack:defencoding japanese-reminder
-		      name tasks done status-requested)
+		      name tasks done status-requested dialog)

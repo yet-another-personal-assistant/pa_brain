@@ -12,4 +12,7 @@
 (defmethod react ((thought dialog) event)
   (let ((intent (getf event :intent)))
     (aif (assoc intent (slot-value thought 'triggers) :test 'starts-with-p)
-	 (funcall (cdr it) event (string-trim " " (subseq intent (length (car it))))))))
+	 (funcall (cdr it) thought event (string-trim " " (subseq intent (length (car it))))))))
+
+(conspack:defencoding dialog
+		      name triggers)

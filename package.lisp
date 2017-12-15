@@ -11,4 +11,6 @@
 	   :process
 	   :greeter
 	   :japanese-reminder
-	   :dialog))
+	   :dialog
+	   :finished-p
+	   :mark-finished))
