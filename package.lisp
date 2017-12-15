@@ -1,5 +1,5 @@
 (defpackage #:com.aragaer.pa-brain
-  (:use #:common-lisp #:conspack)
+  (:use #:common-lisp)
   (:export :thought
 	   :add-thought
 	   :try-handle

@@ -25,7 +25,7 @@
   (setf *default-thoughts* (acons name constructor *default-thoughts*)))
 
 (defun save-state (stream)
-  (encode *thoughts* :stream stream))
+  (conspack:encode *thoughts* :stream stream))
 
 (defun create-defaults ()
   (let ((names (loop for thought in *thoughts*
@@ -35,17 +35,18 @@
 	  do (add-thought (funcall (cdr default))))))
 
 (defun load-state (stream)
-  (setf *thoughts* (decode-stream stream))
+  (setf *thoughts* (conspack:decode-stream stream))
   (create-defaults))
+
+(defun do-save-state ()
+  (with-open-file (stream *saved-file*
+			  :direction :output :if-exists :supersede
+			  :element-type 'unsigned-byte)
+		  (save-state stream)))
 
 (defun init-thoughts ()
   (when *saved-file*
-    (exit-hooks:add-exit-hook
-     #'(lambda ()
-	 (with-open-file (stream *saved-file*
-				 :direction :output :if-exists :supersede
-				 :element-type 'unsigned-byte)
-			 (save-state stream))))
+    (exit-hooks:add-exit-hook 'do-save-state)
     (with-open-file (stream *saved-file*
 			    :direction :input
 			    :if-does-not-exist nil
