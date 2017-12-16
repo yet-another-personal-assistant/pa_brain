@@ -7,7 +7,8 @@
 
 (defclass dialog (thought)
   ((name :initarg :name)
-   (triggers :initarg :triggers)))
+   (triggers :initarg :triggers)
+   (link :initarg :link)))
 
 (defmethod react ((thought dialog) event)
   (let ((intent (getf event :intent)))
@@ -15,4 +16,4 @@
 	 (funcall (cdr it) thought event (string-trim " " (subseq intent (length (car it))))))))
 
 (conspack:defencoding dialog
-		      name triggers)
+		      name triggers link)

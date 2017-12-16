@@ -34,7 +34,10 @@ class TranslatorServer:
         while self.running:
             self.client, _ = self.server.accept()
             while self.running:
-                sdata = self.client.recv(1024)
+                try:
+                    sdata = self.client.recv(1024)
+                except:
+                    break
                 if not sdata:
                     break
                 data = sdata.decode().strip()
@@ -86,7 +89,8 @@ def before_all(context):
         time.sleep(1)
     _set_up_runner(context)
     context.socket = os.path.join(context.dir, "socket")
-    context.user_config = os.path.join(context.dir, "config.yml")
+    context.user_config_file = os.path.join(context.dir, "config.yml")
+    context.user_config = {}
     context.dump = os.path.join(context.dir, "saved")
 
 
@@ -97,4 +101,5 @@ def before_scenario(context, _):
 def after_scenario(context, _):
     context.translator.drop_client()
     context.runner.terminate("brain")
-    os.unlink(context.dump)
+    if os.path.exists(context.dump):
+        os.unlink(context.dump)

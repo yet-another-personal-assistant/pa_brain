@@ -1,29 +1,44 @@
 import atexit
 import os
 
+import yaml
 
-def _write_user_config(context, config_text):
-    with open(context.user_config, "w") as user_config:
-        user_config.write(config_text)
 
+@given('{module} module is enabled')
+def step_impl(context, module):
+    if 'modules' not in context.user_config:
+        context.user_config['modules'] = []
+    context.user_config['modules'].append(module)
 
 @given('the brain is running')
 def step_impl(context):
-    atexit.register(context.runner.terminate, "brain")
-    _write_user_config(context, "")
+    with open(context.user_config_file, "w") as user_config:
+        yaml.dump(context.user_config, user_config)
     context.runner.ensure_running("brain",
                                   with_args=["--socket", context.socket,
-                                             "--config", context.user_config,
+                                             "--config", context.user_config_file,
                                              "--saved", context.dump,
                                              "--translator", context.tr_socket],
                                   socket=context.socket)
+    atexit.register(context.runner.terminate, "brain")
     context.sink = context.runner.get_sink("brain")    
     context.faucet = context.runner.get_faucet("brain")    
 
+@given('already said hello')
+def step_impl(context):
+    context.execute_steps('''
+    When I say "hello"
+    Then pa replies "hello"
+    ''')
 
 @when('I say "{phrase}"')
 def step_impl(context, phrase):
     context.sink.write({"from": {"media": "behave"}, "text": phrase})
+
+
+@when('"{event}" event comes')
+def step_impl(context, event):
+    context.sink.write({"from": {"media": "behave_incoming"}, "intent": event})
 
 
 @then('pa says "{expected}"')

@@ -32,7 +32,8 @@
   (setf *default-thoughts* (acons name constructor *default-thoughts*)))
 
 (defun save-state (stream)
-  (conspack:encode *thoughts* :stream stream))
+  (conspack:tracking-refs ()
+			  (conspack:encode *thoughts* :stream stream)))
 
 (defun create-defaults ()
   (let ((names (loop for thought in *thoughts*
@@ -42,7 +43,8 @@
 	  do (add-thought (funcall (cdr default))))))
 
 (defun load-state (stream)
-  (setf *thoughts* (conspack:decode-stream stream))
+  (conspack:tracking-refs ()
+			  (setf *thoughts* (conspack:decode-stream stream)))
   (create-defaults))
 
 (defun do-save-state ()

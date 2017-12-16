@@ -12,6 +12,7 @@
 	   :greeter
 	   :japanese-reminder
 	   :dont-understand
+	   :scheduled-reminder
 	   :dialog
 	   :finished-p
 	   :mark-finished))

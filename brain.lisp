@@ -13,7 +13,6 @@
 (defvar *keep-going* t)
 
 (add-top-level-command "goodbye" (just-reply "goodbye"))
-(add-top-level-command "unintelligible" (just-reply "failed to parse"))
 
 (defun get-intent (message)
   (aif (assoc :intent message)

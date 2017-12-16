@@ -14,3 +14,9 @@ Feature: Chatting with the brain
      When I say "unintelligible"
      Then pa replies "hello"
       And pa says "failed to parse"
+
+  Scenario: Cron event greeting
+    Given the brain is running
+     When "cron go to bed" event comes
+     Then pa says "hello"
+      And pa says "go to bed"
