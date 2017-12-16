@@ -21,22 +21,17 @@
     (setf tasks (append (ensure-list what) tasks))))
 
 (defmacro japanese-dialog-result (is-done)
-  `(defun ,(intern (format nil "japanese-dialog-~a" (if is-done "yes" "no")))
-       (thought event data)
+  `#'(lambda (thought event data)
        (declare (ignore data))
-     ,(if is-done '(mark-as-done (slot-value thought 'link)))
-     (mark-finished thought)
-     (add-modifier event :japanese-done ,is-done)))
-
-(japanese-dialog-result t)
-(japanese-dialog-result nil)
+       ,(if is-done '(mark-as-done habit))
+       (mark-finished thought)
+       (add-modifier event :japanese-done ,is-done)))
 
 (defun make-japanese-dialog (habit)
   (make-instance 'dialog
 		 :name :japanese-dialog
-		 :link habit
-		 :triggers (acons "yes" 'japanese-dialog-yes
-				  (acons "no" 'japanese-dialog-no nil))))
+		 :triggers (acons "yes" (japanese-dialog-result t)
+				  (acons "no" (japanese-dialog-result nil) nil))))
 
 (defun japanese-request-status (thought event)
   (with-slots (done tasks status-requested) thought
@@ -77,4 +72,4 @@
 	 (setf (getf event :response) (push "bad" (getf event :response))))))
 
 (conspack:defencoding japanese-reminder
-		      name tasks done status-requested dialog)
+		      name tasks done status-requested)
