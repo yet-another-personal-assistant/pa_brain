@@ -102,4 +102,10 @@
 	   (is (getf event2 :modifiers) (acons :seen-already t nil))
 	   (is (getf event3 :modifiers) (acons :hello t nil))))
 
+(let ((event (make-event-from-intent "" (acons :hello t nil)))
+      (a-greeter (make-instance 'greeter)))
+  (setf (getf event :response) '("yo"))
+  (process a-greeter event)
+  (is (getf event :response) '("hello" "yo")))
+
 (finalize)

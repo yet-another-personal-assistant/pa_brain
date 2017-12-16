@@ -18,11 +18,15 @@
 (load "cron.lisp")
 (load "state.lisp")
 (load "greeter.lisp")
+(load "unknown.lisp")
 (load "utils.lisp")
 
 (in-package :com.aragaer.pa-brain)
 
 (process-config)
+
+;(defmacro do-make-instance (cls &rest args)
+;  `#'(lambda () (make-instance ,cls ,args)))
 
 (if *config*
     (aif (gethash "modules" *config*)
@@ -33,6 +37,7 @@
 
 (add-default-thought :greeter #'(lambda () (make-instance 'greeter)))
 (add-default-thought :old #'(lambda () (make-instance 'old-handler)))
+(add-default-thought :dont-understand #'(lambda () (make-instance 'dont-understand)))
 
 (init-thoughts)
 

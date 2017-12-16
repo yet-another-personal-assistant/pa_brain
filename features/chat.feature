@@ -11,5 +11,6 @@ Feature: Chatting with the brain
 
   Scenario: First phrase greeting
     Given the brain is running
-     When I say "yo"
+     When I say "unintelligible"
      Then pa replies "hello"
+      And pa says "failed to parse"

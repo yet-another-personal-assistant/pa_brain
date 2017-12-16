@@ -26,6 +26,7 @@ def step_impl(context, phrase):
     context.sink.write({"from": {"media": "behave"}, "text": phrase})
 
 
+@then('pa says "{expected}"')
 @then('pa replies "{expected}"')
 def step_impl(context, expected):
     if not context.replies:

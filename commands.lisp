@@ -22,8 +22,7 @@
 
 (defun process-command (command commands)
   (aif (assoc command commands :test 'starts-with-p)
-       (funcall (cdr it) (string-trim " " (subseq command (length (car it)))))
-       (unknown-command command)))
+       (funcall (cdr it) (string-trim " " (subseq command (length (car it)))))))
 
 (defclass old-handler (thought)
   ((name :initform :old)))
