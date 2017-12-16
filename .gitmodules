@@ -1,0 +1,3 @@
+[submodule "router"]
+	path = router
+	url = git@github.com:aragaer/pa_router.git
