@@ -24,10 +24,12 @@
 
 (process-config)
 
-(aif (gethash "modules" *config*)
-     (progn
-       (when (member "japanese" it :test 'string-equal)
-	 (add-default-thought :japanese-reminder #'(lambda () (make-instance 'japanese-reminder))))))
+(if *config*
+    (aif (gethash "modules" *config*)
+	 (progn
+	   (when (member "japanese" it :test 'string-equal)
+	     (add-default-thought :japanese-reminder
+				  #'(lambda () (make-instance 'japanese-reminder)))))))
 
 (add-default-thought :greeter #'(lambda () (make-instance 'greeter)))
 (add-default-thought :old #'(lambda () (make-instance 'old-handler)))
