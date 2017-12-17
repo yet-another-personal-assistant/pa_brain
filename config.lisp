@@ -26,13 +26,7 @@
   (with-arg "--socket" (setf *brain-socket-path* value))
   (with-arg "--config" (setf *config* (yaml:parse (uiop:read-file-string value))))
   (with-arg "--saved" (setf *saved-file* value))
-  (with-arg "--translator" (setf *translator-socket-path* value))
-
-  (when *config*
-    (aif (gethash "modules" *config*)
-	 (loop for module in it
-	       do (format t "; Loading \"~a\"~%" module)
-	       do (load (format nil "~a.lisp" module))))))
+  (with-arg "--translator" (setf *translator-socket-path* value)))
 
 (defun get-telegram-id ()
   (gethash "telegram" *config*))

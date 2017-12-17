@@ -69,7 +69,8 @@ def _set_up_runner(context):
     app_config_path = os.path.join(context.dir, "modules.yml")
     with open(app_config_path, "w") as app_config:
         app_config.write("brain:\n"
-                         "  command: sbcl --script run.lisp\n"
+                         "  command: sbcl --noinform --load run.lisp"
+                         " --eval '(com.aragaer.pa-brain:main)'\n"
                          "  type: socket\n"
                          "  cwd: .\n")
     context.runner = Runner()

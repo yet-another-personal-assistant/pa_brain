@@ -1,6 +1,7 @@
 (defpackage #:com.aragaer.pa-brain
   (:use #:common-lisp)
-  (:export :thought
+  (:export :main
+	   :thought
 	   :add-thought
 	   :try-handle
 	   :make-event
