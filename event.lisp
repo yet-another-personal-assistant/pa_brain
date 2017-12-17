@@ -5,7 +5,8 @@
 
 (defun make-event (intent text source)
   (list :intent intent :text text :source source
-	:response nil :modifiers nil))
+	:response nil :modifiers nil
+	:event nil))
 
 (defun add-modifier (event modifier &optional (value t))
   (setf (getf event :modifiers)
