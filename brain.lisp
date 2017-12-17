@@ -43,6 +43,10 @@
     (json:encode-json-plist (append `(:from "pa" :text ,messages) target) *brain-io*)
     (format *brain-io* "~%")))
 
+(defun brain-output-messages (lines target)
+  (if lines
+      (brain-output lines target)))
+
 (add-thought (make-instance 'old-handler))
 
 (defun main-loop ()
@@ -53,6 +57,9 @@
 	do (setq message (brain-input))
 	with event
 	do (setq event (make-event (get-intent message) nil nil))
+	do (setf (getf event :text) (assoc-value :text message))
+	do (aif (assoc :event message)
+		(setf (getf event :event) (cdr it)))
 	do (try-handle event)
-	do (brain-output (ensure-list (getf event :response))
-			 (build-target message))))
+	do (brain-output-messages (ensure-list (getf event :response))
+				  (build-target message))))

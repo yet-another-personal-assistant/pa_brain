@@ -4,23 +4,26 @@
 
 (in-package #:com.aragaer.pa-brain)
 
-(defparameter *greet-timeout* (* 20 60 60))
-
 (defclass greeter (thought)
   ((name :initform :greeter)
-   (last-seen :initform 0)))
+   (said-hello :initform nil)))
 
 (defmethod react ((thought greeter) event)
-  (with-slots (last-seen) thought
-    (cond ((< (+ last-seen *greet-timeout*) (get-universal-time)) (add-modifier event :hello))
-	  ((string-equal (getf event :intent) "hello") (add-modifier event :seen-already)))
-    (setq last-seen (get-universal-time))))
+  (with-slots (said-hello) thought
+    (cond ((not said-hello)
+	   (add-modifier event :hello))
+	  ((string-equal (getf event :event) "new day")
+	   (setf said-hello nil))
+	  ((string-equal (getf event :intent) "hello")
+	   (add-modifier event :seen-already)))))
 
 (defmethod process ((thought greeter) event)
-  (cond ((get-modifier event :hello) (setf (getf event :response)
-					   (push "hello" (getf event :response))))
-	((get-modifier event :seen-already) (setf (getf event :response)
-						  (push "seen already" (getf event :response))))))
+  (with-slots (said-hello) thought
+    (cond ((and (getf event :text) (get-modifier event :hello))
+	   (setf said-hello t)
+	   (setf (getf event :response) (push "hello" (getf event :response))))
+	  ((get-modifier event :seen-already)
+	   (setf (getf event :response) (push "seen already" (getf event :response)))))))
 
 (conspack:defencoding greeter
-		      name last-seen)
+		      name said-hello)

@@ -20,3 +20,16 @@ Feature: Greeting
      When "cron go to bed" event comes
      Then pa says "hello"
       And pa says "go to bed"
+
+  Scenario: Repeated greeting
+    Given the brain is running
+      And already said hello
+     When I say "hello"
+     Then pa replies "seen already"
+
+  Scenario: New day
+    Given the brain is running
+      And already said hello
+      And "new day" event happened
+     When I say "hello"
+     Then pa replies "hello"

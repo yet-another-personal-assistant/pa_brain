@@ -39,9 +39,10 @@ def step_impl(context, phrase):
     context.sink.write({"from": {"media": "behave"}, "text": phrase})
 
 
+@given('"{event}" event happened')
 @when('"{event}" event comes')
 def step_impl(context, event):
-    context.sink.write({"from": {"media": "behave_incoming"}, "intent": event})
+    context.sink.write({"from": {"media": "behave_incoming"}, "event": event})
 
 
 def timeout(signum, flame):

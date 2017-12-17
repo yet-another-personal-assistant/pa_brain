@@ -9,11 +9,11 @@
   ((name :initform :cron)))
 
 (defmethod react ((thought scheduled-reminder) event)
-  (let ((intent (getf event :intent)))
+  (let ((event-text (getf event :event)))
     (if (and (not (getf event :modifiers))
-	     (starts-with-p intent "cron"))
+	     (starts-with-p event-text "cron"))
 	(add-modifier event :scheduled
-		      (string-trim " " (subseq intent (length "cron")))))))
+		      (string-trim " " (subseq event-text (length "cron")))))))
 
 (defmethod process ((thought scheduled-reminder) event)
   (aif (get-modifier event :scheduled)

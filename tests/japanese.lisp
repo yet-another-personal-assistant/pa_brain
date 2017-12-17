@@ -12,10 +12,29 @@
 
 (setf *thought-class-under-test* 'japanese-reminder)
 
+(defun build-event (&rest event-data)
+  (let ((event (make-event nil nil nil)))
+    (loop while event-data
+	  with field
+	  with value
+	  do (setf field (pop event-data))
+	  do (setf value (pop event-data))
+	  do (setf (getf event field) value))
+    event))
+
+(defun verify-modifiers-for-2 (event-data modifiers &optional thought)
+  (if (not thought)
+      (setf thought (make-instance *thought-class-under-test*)))
+  (let ((event (apply 'build-event event-data)))
+    (react thought event)
+    (is (getf event :modifiers) modifiers)))
+
 (plan nil)
-(verify-modifiers-for "japanese report done" (acons :japanese-done t nil))
-(verify-modifiers-for "hello" nil)
-(verify-modifiers-for "cron study japanese" (acons :japanese-request t nil))
+(verify-modifiers-for-2 '(:event "japanese report done") nil)
+(verify-modifiers-for-2 '(:intent "japanese report done") (acons :japanese-done t nil))
+(verify-modifiers-for-2 '(:intent "hello") nil)
+(verify-modifiers-for-2 '(:event "cron study japanese") (acons :japanese-request t nil))
+(verify-modifiers-for-2 '(:intent "cron study japanese") nil)
 (verify-modifiers-for "yes" nil)
 (verify-modifiers-for "no" nil)
 (verify-modifiers-for "japanese report anki" (acons :japanese-done t nil))
@@ -23,50 +42,57 @@
 
 (let ((thought (make-instance 'japanese-reminder)))
   (react thought (make-event-from-intent "japanese report done"))
-  (verify-modifiers-for "cron study japanese" (acons :japanese-request nil nil) thought))
+  (verify-modifiers-for-2 '(:event "cron study japanese")
+			  (acons :japanese-request nil nil) thought))
 
 (let ((thought (make-instance 'japanese-reminder)))
   (react thought (make-event-from-intent "japanese report anki"))
-  (verify-modifiers-for "cron study japanese" (acons :japanese-request '("duolingo") nil) thought))
+  (verify-modifiers-for-2 '(:event "cron study japanese")
+			  (acons :japanese-request '("duolingo") nil) thought))
 
 (let ((thought (make-instance 'japanese-reminder)))
   (react thought (make-event-from-intent "japanese report duolingo"))
-  (verify-modifiers-for "cron study japanese" (acons :japanese-request '("anki") nil) thought))
+  (verify-modifiers-for-2 '(:event "cron study japanese")
+			  (acons :japanese-request '("anki") nil) thought))
 
 (let ((thought (make-instance 'japanese-reminder))
       (this-time (get-universal-time)))
   (react thought (make-event-from-intent "japanese report done"))
   (with-unlock
    (dflet ((get-universal-time () this-time))
-	  (verify-modifiers-for "cron study japanese" (acons :japanese-request nil nil) thought))
+	  (verify-modifiers-for-2 '(:event "cron study japanese")
+				  (acons :japanese-request nil nil) thought))
    (dflet ((get-universal-time () (+ this-time (* 24 60 60))))
-	  (verify-modifiers-for "cron study japanese" (acons :japanese-request t nil) thought))))
+	  (verify-modifiers-for-2 '(:event "cron study japanese")
+				  (acons :japanese-request t nil) thought))))
 
 (let ((thought (make-instance 'japanese-reminder)))
-  (react thought (make-event-from-intent "cron study japanese"))
+  (react thought (build-event :event "cron study japanese"))
   (verify-modifiers-for "yes" (acons :japanese-done t nil) thought)
   (verify-modifiers-for "yes" nil thought))
 
 (let ((thought (make-instance 'japanese-reminder)))
-  (react thought (make-event-from-intent "cron study japanese"))
+  (react thought (build-event :event "cron study japanese"))
   (verify-modifiers-for "no" (acons :japanese-done nil nil) thought)
   (verify-modifiers-for "no" nil thought))
 
 (let ((thought (make-instance 'japanese-reminder)))
-  (react thought (make-event-from-intent "cron study japanese"))
+  (react thought (build-event :event "cron study japanese"))
   (verify-modifiers-for "japanese report done" (acons :japanese-done t nil) thought)
   (verify-modifiers-for "yes" nil thought))
 
 (let ((thought (make-instance 'japanese-reminder)))
-  (react thought (make-event-from-intent "cron study japanese"))
+  (react thought (build-event :event "cron study japanese"))
   (verify-modifiers-for "yes" (acons :japanese-done t nil) thought)
-  (verify-modifiers-for "cron study japanese" (acons :japanese-request nil nil) thought)
+  (verify-modifiers-for-2 '(:event "cron study japanese")
+			  (acons :japanese-request nil nil) thought)
   (verify-modifiers-for "yes" nil thought))
 
 (let ((thought (make-instance 'japanese-reminder)))
-  (react thought (make-event-from-intent "cron study japanese"))
+  (react thought (build-event :event "cron study japanese"))
   (verify-modifiers-for "no" (acons :japanese-done nil nil) thought)
-  (verify-modifiers-for "cron study japanese" (acons :japanese-request t nil) thought))
+  (verify-modifiers-for-2 '(:event "cron study japanese")
+			  (acons :japanese-request t nil) thought))
 
 (verify-messages-for (acons :japanese-done t nil) '("good"))
 (verify-messages-for nil nil)

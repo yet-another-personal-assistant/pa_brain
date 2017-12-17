@@ -22,4 +22,12 @@
   (setf (getf event :response) '("yo"))
   (process a-thought event)
   (is (getf event :response) '("yo" "failed to parse")))
+
+(let ((event (make-event nil nil nil))
+      (reminder (make-instance 'dont-understand)))
+  (setf (getf event :event) "cron go to bed")
+  (setf (getf event :modifiers) (acons :scheduled "go to bed" nil))
+  (react reminder event)
+  (process reminder event)
+  (is (getf event :response) nil))
 (finalize)
