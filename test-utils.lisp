@@ -28,3 +28,19 @@
   `(sb-ext:with-unlocked-packages ("COMMON-LISP") ,@body)
   #-sbcl
   `(progn ,@body))
+
+(defparameter *thought-class-under-test* nil)
+
+(defun verify-modifiers-for (intent modifiers
+				    &optional (thought
+					       (if *thought-class-under-test*
+						   (make-instance *thought-class-under-test*))))
+  (let ((event (make-event-from-intent intent)))
+    (react thought event)
+    (is (getf event :modifiers) modifiers)))
+
+(defun verify-messages-for (modifiers messages)
+  (let ((event (make-event-from-intent "" modifiers))
+	(a-reminder (make-instance *thought-class-under-test*)))
+    (process a-reminder event)
+    (is (getf event :response) messages)))

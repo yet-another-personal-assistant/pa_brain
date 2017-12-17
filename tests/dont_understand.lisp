@@ -8,18 +8,7 @@
 
 (in-package #:unknown-test)
 (load #P"test-utils.lisp")
-
-(defun verify-modifiers-for (intent modifiers
-				    &optional (thought (make-instance 'dont-understand)))
-  (let ((event (make-event-from-intent intent)))
-    (react thought event)
-    (is (getf event :modifiers) modifiers)))
-
-(defun verify-messages-for (modifiers messages)
-  (let ((event (make-event-from-intent "" modifiers))
-	(a-reminder (make-instance 'dont-understand)))
-    (process a-reminder event)
-    (is (getf event :response) messages)))
+(setf *thought-class-under-test* 'dont-understand)
 
 (plan nil)
 (verify-modifiers-for "unintelligible" (acons :dont-understand t nil))
@@ -27,6 +16,7 @@
 
 (verify-messages-for (acons :dont-understand t nil) '("failed to parse"))
 (verify-messages-for nil nil)
+
 (let ((event (make-event-from-intent "" (acons :dont-understand t nil)))
       (a-thought (make-instance 'dont-understand)))
   (setf (getf event :response) '("yo"))

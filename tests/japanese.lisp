@@ -10,17 +10,7 @@
 (in-package #:japanese-test)
 (load #P"test-utils.lisp")
 
-(defun verify-modifiers-for (intent modifiers
-				    &optional (thought (make-instance 'japanese-reminder)))
-  (let ((event (make-event-from-intent intent)))
-    (react thought event)
-    (is (getf event :modifiers) modifiers)))
-
-(defun verify-messages-for (modifiers messages)
-  (let ((event (make-event-from-intent "" modifiers))
-	(a-reminder (make-instance 'japanese-reminder)))
-    (process a-reminder event)
-    (is (getf event :response) messages)))
+(setf *thought-class-under-test* 'japanese-reminder)
 
 (plan nil)
 (verify-modifiers-for "japanese report done" (acons :japanese-done t nil))
