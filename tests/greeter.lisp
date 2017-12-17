@@ -78,4 +78,12 @@
   (is (getf event2 :modifiers) (acons :seen-already t nil))
   (is (getf event4 :modifiers) (acons :hello t nil)))
 
+(let ((event (build-event :event "cron go to bed"))
+      (a-greeter (make-instance 'greeter)))
+  (setf (getf event :modifiers) (acons :scheduled "go to bed" nil))
+  (react a-greeter event)
+  (setf (getf event :response) '("go to bed"))
+  (process a-greeter event)
+  (is (getf event :response) '("hello" "go to bed")))
+
 (finalize)

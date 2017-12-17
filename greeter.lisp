@@ -19,7 +19,9 @@
 
 (defmethod process ((thought greeter) event)
   (with-slots (said-hello) thought
-    (cond ((and (getf event :text) (get-modifier event :hello))
+    (cond ((and (or (getf event :text)
+		    (getf event :response))
+		(get-modifier event :hello))
 	   (setf said-hello t)
 	   (setf (getf event :response) (push "hello" (getf event :response))))
 	  ((get-modifier event :seen-already)

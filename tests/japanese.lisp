@@ -12,23 +12,6 @@
 
 (setf *thought-class-under-test* 'japanese-reminder)
 
-(defun build-event (&rest event-data)
-  (let ((event (make-event nil nil nil)))
-    (loop while event-data
-	  with field
-	  with value
-	  do (setf field (pop event-data))
-	  do (setf value (pop event-data))
-	  do (setf (getf event field) value))
-    event))
-
-(defun verify-modifiers-for-2 (event-data modifiers &optional thought)
-  (if (not thought)
-      (setf thought (make-instance *thought-class-under-test*)))
-  (let ((event (apply 'build-event event-data)))
-    (react thought event)
-    (is (getf event :modifiers) modifiers)))
-
 (plan nil)
 (verify-modifiers-for-2 '(:event "japanese report done") nil)
 (verify-modifiers-for-2 '(:intent "japanese report done") (acons :japanese-done t nil))

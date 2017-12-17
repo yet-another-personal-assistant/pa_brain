@@ -48,3 +48,20 @@
 	(a-thought (make-instance *thought-class-under-test*)))
     (process a-thought event)
     (is (getf event :response) messages)))
+
+(defun build-event (&rest event-data)
+  (let ((event (make-event nil nil nil)))
+    (loop while event-data
+	  with field
+	  with value
+	  do (setf field (pop event-data))
+	  do (setf value (pop event-data))
+	  do (setf (getf event field) value))
+    event))
+
+(defun verify-modifiers-for-2 (event-data modifiers &optional thought)
+  (if (not thought)
+      (setf thought (make-instance *thought-class-under-test*)))
+  (let ((event (apply 'build-event event-data)))
+    (react thought event)
+    (is (getf event :modifiers) modifiers)))
