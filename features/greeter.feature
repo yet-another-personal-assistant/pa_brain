@@ -1,10 +1,10 @@
 # vim: tabstop=4 expandtab shiftwidth=2 softtabstop=2
-Feature: Chatting with the brain
+Feature: Greeting
   As a personal assistant user
-  I want to be able to chat to my personal assistant
-  So that it responds to my phrases
+  I want my personal assistant to greet me properly
+  So that it feels more like a living person
 
-  Scenario: Greeting
+  Scenario: Reply to greeting
     Given the brain is running
      When I say "hello"
      Then pa replies "hello"

@@ -1,5 +1,6 @@
 import atexit
 import os
+import signal
 
 import yaml
 
@@ -9,6 +10,7 @@ def step_impl(context, module):
     if 'modules' not in context.user_config:
         context.user_config['modules'] = []
     context.user_config['modules'].append(module)
+
 
 @given('the brain is running')
 def step_impl(context):
@@ -23,6 +25,7 @@ def step_impl(context):
     atexit.register(context.runner.terminate, "brain")
     context.sink = context.runner.get_sink("brain")    
     context.faucet = context.runner.get_faucet("brain")    
+
 
 @given('already said hello')
 def step_impl(context):
@@ -41,14 +44,21 @@ def step_impl(context, event):
     context.sink.write({"from": {"media": "behave_incoming"}, "intent": event})
 
 
+def timeout(signum, flame):
+    raise Exception("timeout")
+
+
 @then('pa says "{expected}"')
 @then('pa replies "{expected}"')
 def step_impl(context, expected):
     if not context.replies:
+        signal.signal(signal.SIGALRM, timeout)
+        signal.alarm(1)
         while True:
             message = context.faucet.read()
             if message:
                 break
+        signal.alarm(0)
         context.replies.extend(message['text'])
     
     reply = context.replies.pop(0)
