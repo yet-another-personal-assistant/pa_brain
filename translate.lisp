@@ -29,6 +29,7 @@
   (translate message user "human2pa"))
 
 (defun translator-refresh (arg)
+  (declare (ignore arg))
   (json:encode-json-plist (list :command "refresh") *translator-io*)
   (format *translator-io* "~%")
   "done")

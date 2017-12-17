@@ -6,7 +6,7 @@
 (in-package #:com.aragaer.pa-brain)
 
 (defmacro just-reply (reply)
-  `#'(lambda (arg) ,reply))
+  `#'(lambda (arg) (declare (ignore arg)) ,reply))
 
 (defvar *top-level-commands* ())
 
