@@ -6,6 +6,11 @@
     (setf (getf result :modifiers) modifiers)
     result))
 
+(defun make-event-from-text (text &optional modifiers)
+  (let ((result (make-event text text nil)))
+    (setf (getf result :modifiers) modifiers)
+    result))
+
 (defclass test-thought (thought)
   ((messages :initarg :messages)
    (triggers :initarg :triggers)))
@@ -31,16 +36,15 @@
 
 (defparameter *thought-class-under-test* nil)
 
-(defun verify-modifiers-for (intent modifiers
-				    &optional (thought
-					       (if *thought-class-under-test*
-						   (make-instance *thought-class-under-test*))))
-  (let ((event (make-event-from-intent intent)))
+(defun verify-modifiers-for (text modifiers &optional
+				  (thought (if *thought-class-under-test*
+					       (make-instance *thought-class-under-test*))))
+  (let ((event (make-event-from-text text)))
     (react thought event)
     (is (getf event :modifiers) modifiers)))
 
 (defun verify-messages-for (modifiers messages)
   (let ((event (make-event-from-intent "" modifiers))
-	(a-reminder (make-instance *thought-class-under-test*)))
-    (process a-reminder event)
+	(a-thought (make-instance *thought-class-under-test*)))
+    (process a-thought event)
     (is (getf event :response) messages)))
