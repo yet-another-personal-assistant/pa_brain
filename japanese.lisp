@@ -5,19 +5,16 @@
 
 (in-package #:com.aragaer.pa-brain)
 
-(defparameter *reminder-reset* (* 24 60 60))
 (defparameter *tasks* '("anki" "duolingo"))
 
 (defclass japanese-reminder (thought)
   ((name :initform :japanese-reminder)
    (tasks :initform nil)
-   (done :initform 0)
    (status-requested :initform nil)
    (dialog :initform nil)))
 
 (defun mark-as-done (thought &optional (what *tasks*))
   (with-slots (done tasks) thought
-    (setf done (get-universal-time))
     (setf tasks (append (ensure-list what) tasks))))
 
 (defmacro japanese-dialog-result (is-done)
@@ -34,9 +31,7 @@
 				  (acons "no" (japanese-dialog-result nil) nil))))
 
 (defun japanese-request-status (thought event)
-  (with-slots (done tasks status-requested) thought
-    (when (>= (- (get-universal-time) done) *reminder-reset*)
-      (setf tasks nil))
+  (with-slots (tasks status-requested) thought
     (let ((not-done (loop for task in *tasks*
 			  unless (member task tasks :test 'string-equal)
 			  collect task)))
@@ -44,7 +39,7 @@
       (not (null not-done)))))
 
 (defmethod react ((thought japanese-reminder) event)
-  (with-slots (dialog) thought
+  (with-slots (dialog tasks) thought
     (if dialog (react dialog event))
     (let ((intent (getf event :intent))
 	  (event-text (getf event :event))
@@ -54,7 +49,9 @@
 	       (mark-as-done thought (if (string-equal what "done") *tasks* what)))
 	     (add-modifier event :japanese-done))
 	    ((string-equal event-text "cron study japanese")
-	     (setf need-dialog (japanese-request-status thought event))))
+	     (setf need-dialog (japanese-request-status thought event)))
+	    ((string-equal event-text "new day")
+	     (setf tasks nil)))
       (if (and need-dialog (not dialog))
 	  (setf dialog (make-japanese-dialog thought)))
       (if (and dialog (not need-dialog))
@@ -73,4 +70,4 @@
 	 (setf (getf event :response) (push "bad" (getf event :response))))))
 
 (conspack:defencoding japanese-reminder
-		      name tasks done status-requested)
+		      name tasks status-requested)

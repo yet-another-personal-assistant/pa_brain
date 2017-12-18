@@ -4,7 +4,6 @@
 (defpackage japanese-test
   (:use :cl
 	:prove
-	:cl-mock
 	:com.aragaer.pa-brain))
 
 (in-package #:japanese-test)
@@ -29,6 +28,12 @@
 			  (acons :japanese-request nil nil) thought))
 
 (let ((thought (make-instance 'japanese-reminder)))
+  (react thought (make-event-from-intent "japanese report done"))
+  (react thought (build-event :event "new day"))
+  (verify-modifiers-for-2 '(:event "cron study japanese")
+			  (acons :japanese-request t nil) thought))
+
+(let ((thought (make-instance 'japanese-reminder)))
   (react thought (make-event-from-intent "japanese report anki"))
   (verify-modifiers-for-2 '(:event "cron study japanese")
 			  (acons :japanese-request '("duolingo") nil) thought))
@@ -37,17 +42,6 @@
   (react thought (make-event-from-intent "japanese report duolingo"))
   (verify-modifiers-for-2 '(:event "cron study japanese")
 			  (acons :japanese-request '("anki") nil) thought))
-
-(let ((thought (make-instance 'japanese-reminder))
-      (this-time (get-universal-time)))
-  (react thought (make-event-from-intent "japanese report done"))
-  (with-unlock
-   (dflet ((get-universal-time () this-time))
-	  (verify-modifiers-for-2 '(:event "cron study japanese")
-				  (acons :japanese-request nil nil) thought))
-   (dflet ((get-universal-time () (+ this-time (* 24 60 60))))
-	  (verify-modifiers-for-2 '(:event "cron study japanese")
-				  (acons :japanese-request t nil) thought))))
 
 (let ((thought (make-instance 'japanese-reminder)))
   (react thought (build-event :event "cron study japanese"))

@@ -4,6 +4,9 @@ import signal
 
 import yaml
 
+from behave import *
+from nose.tools import eq_
+
 
 @given('{module} module is enabled')
 def step_impl(context, module):
@@ -49,19 +52,30 @@ def timeout(signum, flame):
     raise Exception("timeout")
 
 
-@then('pa says "{expected}"')
-@then('pa replies "{expected}"')
-def step_impl(context, expected):
+def _get_reply(context):
     if not context.replies:
         signal.signal(signal.SIGALRM, timeout)
         signal.alarm(1)
         while True:
-            message = context.faucet.read()
+            try:
+                message = context.faucet.read()
+            except:
+                break
             if message:
                 break
         signal.alarm(0)
-        context.replies.extend(message['text'])
-    
-    reply = context.replies.pop(0)
-    if expected != reply:
-        raise Exception("Expected '{}' got '{}'".format(expected, reply))
+        if message is not None:
+            context.replies.extend(message['text'])
+    if context.replies:
+        return context.replies.pop(0)
+
+
+@then('pa says "{expected}"')
+@then('pa replies "{expected}"')
+def step_impl(context, expected):
+    eq_(_get_reply(context), expected)
+
+
+@then('pa says nothing')
+def step_impl(context):
+    eq_(_get_reply(context), None)
