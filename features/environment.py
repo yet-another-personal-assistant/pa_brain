@@ -47,6 +47,7 @@ class TranslatorServer:
                 if 'command' in event:
                     pass
                 else:
+                    assert event['text'] is not None
                     event['reply'] = event['text']
                     result = json.dumps(event, ensure_ascii=False)
                     sresult = "{}\n".format(result).encode()

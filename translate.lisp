@@ -26,7 +26,7 @@
   (translate message "pa" "pa2human"))
 
 (defun translate-human2pa (message &optional (user "user"))
-  (translate message user "human2pa"))
+  (if message (translate message user "human2pa")))
 
 (defun translator-refresh (arg)
   (declare (ignore arg))
