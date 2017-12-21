@@ -49,6 +49,7 @@ class TranslatorServer:
                 else:
                     assert event['text'] is not None
                     event['reply'] = event['text']
+                    _LOGGER.info("Translator: %s", event['text'])
                     result = json.dumps(event, ensure_ascii=False)
                     sresult = "{}\n".format(result).encode()
                     self.client.send(sresult)

@@ -12,6 +12,15 @@
 (in-package #:state-test)
 (load #P"test-utils.lisp")
 
+(defun clear-state ()
+  (uiop/stream:with-temporary-file (:stream s
+					    :direction :io
+					    :prefix "THT"
+					    :element-type 'unsigned-byte)
+				   (encode nil :stream s)
+				   (file-position s 0)
+				   (load-state s)))
+
 (plan nil)
 (add-thought (make-instance 'test-thought
 			    :messages '("yo")
@@ -29,16 +38,8 @@
   (is (getf event2 :response) '("hi" "there" "yo"))
   (is (getf event3 :response) nil))
 
-(defvar *x* nil)
-
 (format t "no default, empty saved~%")
-(uiop/stream:with-temporary-file (:stream s
-					  :direction :io
-					  :prefix "THT"
-					  :element-type 'unsigned-byte)
-				 (encode nil :stream s)
-				 (file-position s 0)
-				 (load-state s))
+(clear-state)
 (let ((event1 (make-event-from-intent "hello")))
   (try-handle event1)
   (is (getf event1 :response) nil))
@@ -69,15 +70,23 @@
   (process a-greeter event2)
   (is (getf event1 :response) (getf event2 :response)))
 
+(format t "weighted add~%")
+(clear-state)
+(add-thought (make-instance 'test-thought
+			    :messages '("yo")
+			    :triggers '("test" "ping"))
+	     :priority 1)
+(add-thought (make-instance 'test-thought
+			    :messages '("hi" "there")
+			    :triggers '("ping")))
+(let ((event (make-event-from-intent "ping")))
+  (try-handle event)
+  (is (getf event :response) '("yo" "hi" "there")))
+
+; This adds a default greeter, from this point each test will have greeter
 (format t "default greeter, saved empty~%")
 (add-default-thought :greeter #'(lambda () (make-instance 'greeter)))
-(uiop/stream:with-temporary-file (:stream s
-					  :direction :io
-					  :prefix "THT"
-					  :element-type 'unsigned-byte)
-				 (encode nil :stream s)
-				 (file-position s 0)
-				 (load-state s))
+(clear-state)
 (let ((event1 (make-event-from-intent "hello"))
       (event2 (make-event-from-intent "hello"))
       (a-greeter (make-instance 'greeter)))
@@ -111,4 +120,16 @@
   (process a-greeter event2)
   (is (getf event1 :response) (getf event2 :response)))
 
+(format t "default priority~%")
+(add-default-thought :test #'(lambda () (make-instance 'test-thought
+						       :messages '("yo")
+						       :triggers '("ping"))))
+(add-default-thought :test2 #'(lambda () (make-instance 'test-thought
+							:messages '("yo2")
+							:triggers '("ping")))
+		     :priority 1)
+(clear-state)
+(let ((event (make-event-from-intent "ping")))
+  (try-handle event)
+  (is (getf event :response) '("hello" "yo2" "yo")))
 (finalize)

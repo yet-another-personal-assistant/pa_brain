@@ -12,6 +12,7 @@
 
 (plan nil)
 (verify-modifiers-for "unintelligible" (acons :dont-understand t nil))
+(verify-modifiers-for "unintelligible stuff" (acons :dont-understand "stuff" nil))
 (verify-modifiers-for "hello" nil)
 
 (verify-messages-for (acons :dont-understand t nil) '("failed to parse"))

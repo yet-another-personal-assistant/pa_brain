@@ -16,14 +16,9 @@
 (defun add-top-level-command (command handler)
   (add-command *top-level-commands* command handler))
 
-(defun unknown-command (command)
-  (when (> (length command) 0)
-    (format nil "unknown command \"~a\"" command)))
-
 (defun process-command (command commands)
   (aif (assoc command commands :test 'starts-with-p)
-       (funcall (cdr it) (string-trim " " (subseq command (length (car it)))))
-       (unknown-command command)))
+       (funcall (cdr it) (string-trim " " (subseq command (length (car it)))))))
 
 (defclass old-handler (thought)
   ((name :initform :old)))
@@ -33,6 +28,18 @@
 
 (defmethod react ((thought old-handler) event))
 
+(defun known-hello-or-empty-p (event)
+  (let ((intent (getf event :intent))
+	(mods (getf event :modifiers)))
+    (or (assoc-if-not #'(lambda (mod) (equalp mod :hello)) mods)
+	(not intent) ; no intent means an internal event
+	(string= "hello" intent)
+	(string= "" intent))))
+
 (defmethod process ((thought old-handler) event)
-  (if (not (or (getf event :modifiers) (getf event :response)))
-      (add-response event (process-command (getf event :intent) *top-level-commands*))))
+  (let ((intent (getf event :intent)))
+    (unless (getf event :response)
+      (aif (process-command intent *top-level-commands*)
+	   (add-response event it)
+	   (unless (known-hello-or-empty-p event)
+	     (add-response event (format nil "unknown command \"~a\"" intent)))))))

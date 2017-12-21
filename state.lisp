@@ -20,27 +20,28 @@
   (setf (slot-value thought 'finished) value))
 
 (defun try-handle (event)
-  (loop for thought in *thoughts*
+  (loop for (prio . thought) in *thoughts*
 	do (react thought event))
-  (loop for thought in *thoughts*
+  (loop for (prio . thought) in *thoughts*
 	do (process thought event)))
 
-(defun add-thought (thought)
-  (push thought *thoughts*))
+(defun add-thought (thought &key (priority 0))
+  (setf *thoughts* (stable-sort (acons priority thought *thoughts*)
+				#'> :key #'car)))
 
-(defun add-default-thought (name constructor)
-  (setf *default-thoughts* (acons name constructor *default-thoughts*)))
+(defun add-default-thought (name constructor &key (priority 0))
+  (setf *default-thoughts* (acons name (cons constructor priority) *default-thoughts*)))
 
 (defun save-state (stream)
   (conspack:tracking-refs ()
 			  (conspack:encode *thoughts* :stream stream)))
 
 (defun create-defaults ()
-  (let ((names (loop for thought in *thoughts*
+  (let ((names (loop for (prio . thought) in *thoughts*
 		     collecting (slot-value thought 'name))))
-    (loop for default in *default-thoughts*
-	  when (not (member (car default) names))
-	  do (add-thought (funcall (cdr default))))))
+    (loop for (name . (constructor . prio)) in *default-thoughts*
+	  do (unless (member name names)
+	       (add-thought (funcall constructor) :priority prio)))))
 
 (defun load-state (stream)
   (conspack:tracking-refs ()

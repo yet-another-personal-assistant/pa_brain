@@ -47,8 +47,6 @@
   (if lines
       (brain-output lines target)))
 
-(add-thought (make-instance 'old-handler))
-
 (defun main-loop ()
   (translator-connect)
   (brain-accept)
