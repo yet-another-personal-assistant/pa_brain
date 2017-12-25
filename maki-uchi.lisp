@@ -32,5 +32,3 @@
 			     (cons "log" 'maki-uchi-log))))
 
 (add-top-level-command "maki-uchi" 'maki-uchi)
-
-(if *config* (setf *maki-uchi-log-file* (gethash "maki-uchi" *config*)))
