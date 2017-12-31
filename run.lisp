@@ -20,6 +20,7 @@
 (load "utils.lisp")
 (load "maki-uchi.lisp")
 (load "japanese.lisp")
+(load "admin.lisp")
 
 (in-package :com.aragaer.pa-brain)
 
@@ -35,6 +36,8 @@
 	(when modules
 	  (when (member "maki-uchi" modules :test 'string-equal)
 	    (setf *maki-uchi-log-file* (gethash "maki-uchi" *config*)))
+	  (when (member "admin" modules :test 'string-equal)
+	    (add-default-thought :admin (do-make-instance 'admin-thought)))
 	  (when (member "japanese" modules :test 'string-equal)
 	    (add-default-thought :japanese-reminder (do-make-instance 'japanese-reminder))))))
 

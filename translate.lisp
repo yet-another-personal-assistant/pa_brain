@@ -28,10 +28,7 @@
 (defun translate-human2pa (message &optional (user "user"))
   (if message (translate message user "human2pa")))
 
-(defun translator-refresh (arg)
-  (declare (ignore arg))
+(defun translator-refresh ()
   (json:encode-json-plist (list :command "refresh") *translator-io*)
   (format *translator-io* "~%")
   "done")
-
-(add-top-level-command "reload phrases" 'translator-refresh)
