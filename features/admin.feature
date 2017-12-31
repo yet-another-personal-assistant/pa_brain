@@ -11,3 +11,9 @@ Feature: Administration
      When I say "reload phrases"
      Then translator gets "refresh" command
       And pa says "done"
+
+  Scenario: Nothing without module
+    Given the brain is running
+      And already said hello
+     When I say "reload phrases"
+     Then pa replies "unknown command "reload phrases""

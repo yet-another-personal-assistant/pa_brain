@@ -95,12 +95,12 @@ def before_all(context):
     _set_up_runner(context)
     context.socket = os.path.join(context.dir, "socket")
     context.user_config_file = os.path.join(context.dir, "config.yml")
-    context.user_config = {}
     context.dump = os.path.join(context.dir, "saved")
 
 
 def before_scenario(context, _):
     context.replies = []
+    context.user_config = {}
 
 
 def after_scenario(context, _):

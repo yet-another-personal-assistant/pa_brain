@@ -23,8 +23,7 @@
 (plan nil)
 (cl-mock:with-mocks ()
 		    (cl-mock:if-called 'com.aragaer.pa-brain:translator-refresh
-				       (lambda (arg)
-					 (declare (ignore arg))
+				       (lambda ()
 					 (setf *refresh-called* t)
 					 "done"))
 		    (verify-messages "hello" nil)
