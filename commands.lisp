@@ -5,9 +5,6 @@
 
 (in-package #:com.aragaer.pa-brain)
 
-(defmacro just-reply (reply)
-  `#'(lambda (arg) (declare (ignore arg)) ,reply))
-
 (defvar *top-level-commands* ())
 
 (defmacro add-command (subset command handler)

@@ -12,7 +12,7 @@
 
 (plan nil)
 (verify-modifiers-for "hello" (acons :hello t nil))
-(verify-modifiers-for "goodbye" (acons :hello t nil))
+(verify-modifiers-for "goodbye" (acons :goodbye t nil))
 (let ((event (make-event nil nil nil))
       (a-greeter (make-instance 'greeter)))
   (process a-greeter event)
@@ -28,7 +28,7 @@
       (a-greeter (make-instance 'greeter)))
   (react a-greeter event)
   (process a-greeter event)
-  (verify-modifiers-for "goodbye" nil a-greeter))
+  (verify-modifiers-for "goodbye" (acons :goodbye t nil) a-greeter))
 
 (let ((event (make-event-from-text "hello"))
       (a-greeter (make-instance 'greeter)))
@@ -61,6 +61,10 @@
 	do (react a-greeter event)
 	do (process a-greeter event))
   (is (getf event3 :modifiers) (acons :hello t nil)))
+
+(let ((event (make-event-from-text "goodbye" (acons :goodbye t nil))))
+  (process (make-instance 'greeter) event)
+  (is (getf event :response) '("goodbye")))
 
 (let ((event1 (make-event-from-text "hello"))
       (event2 (make-event-from-text "hello"))

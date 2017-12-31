@@ -12,8 +12,6 @@
 
 (defvar *keep-going* t)
 
-(add-top-level-command "goodbye" (just-reply "goodbye"))
-
 (defun get-intent (message)
   (aif (assoc :intent message)
        (cdr it)

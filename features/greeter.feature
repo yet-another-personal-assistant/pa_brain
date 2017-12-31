@@ -33,3 +33,8 @@ Feature: Greeting
       And "new day" event happened
      When I say "hello"
      Then pa replies "hello"
+
+  Scenario: Goodbye
+    Given the brain is running
+     When I say "goodbye"
+     Then pa replies "goodbye"
