@@ -1,11 +1,16 @@
 import atexit
+import logging
 import os
 import signal
+import time
 
 import yaml
 
 from behave import *
 from nose.tools import eq_
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @given('{module} module is enabled')
@@ -64,10 +69,14 @@ def _get_reply(context):
             if message:
                 break
         signal.alarm(0)
+        _LOGGER.debug("Got message %s", message)
         if message is not None:
             context.replies.extend(message['text'])
     if context.replies:
-        return context.replies.pop(0)
+        result = context.replies.pop(0)
+        _LOGGER.info("got reply '%s'", result)
+        return result
+    _LOGGER.info("got no reply")
 
 
 @then('pa says "{expected}"')
@@ -79,3 +88,13 @@ def step_impl(context, expected):
 @then('pa says nothing')
 def step_impl(context):
     eq_(_get_reply(context), None)
+
+
+@then('translator gets "{command}" command')
+def step_impl(context, command):
+    signal.signal(signal.SIGALRM, timeout)
+    signal.alarm(1)
+    while not context.tr_commands:
+        time.sleep(0.01)
+    signal.alarm(0)
+    eq_(context.tr_commands.pop(0), command)

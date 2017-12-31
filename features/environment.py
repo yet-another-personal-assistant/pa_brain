@@ -21,11 +21,12 @@ _LOGGER = logging.getLogger(__name__)
 
 class TranslatorServer:
 
-    def __init__(self, path):
+    def __init__(self, path, commands):
         self.running = True
         self.server = None
         self.client = None
         self.path = path
+        self.commands = commands
 
     def run_forever(self):
         self.server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -45,7 +46,7 @@ class TranslatorServer:
                     continue
                 event = json.loads(data)
                 if 'command' in event:
-                    pass
+                    self.commands.append(event['command'])
                 else:
                     assert event['text'] is not None
                     event['reply'] = event['text']
@@ -83,7 +84,8 @@ def before_all(context):
     context.dir = mkdtemp()
     atexit.register(shutil.rmtree, context.dir)
     context.tr_socket = os.path.join(context.dir, "tr_socket")
-    context.translator = TranslatorServer(context.tr_socket)
+    context.tr_commands = []
+    context.translator = TranslatorServer(context.tr_socket, context.tr_commands)
     context.tr_thread = Thread(target=context.translator.run_forever, daemon=True)
     context.tr_thread.start()
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
