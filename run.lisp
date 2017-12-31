@@ -31,11 +31,12 @@
   (process-config)
 
   (if *config*
-      (aif (gethash "modules" *config*)
-	   (when (member "maki-uchi" it :test 'string-equal)
-	     (setf *maki-uchi-log-file* (gethash "maki-uchi" *config*)))
-	   (when (member "japanese" it :test 'string-equal)
-	     (add-default-thought :japanese-reminder (do-make-instance 'japanese-reminder)))))
+      (let ((modules (gethash "modules" *config*)))
+	(when modules
+	  (when (member "maki-uchi" modules :test 'string-equal)
+	    (setf *maki-uchi-log-file* (gethash "maki-uchi" *config*)))
+	  (when (member "japanese" modules :test 'string-equal)
+	    (add-default-thought :japanese-reminder (do-make-instance 'japanese-reminder))))))
 
   (add-default-thought :old (do-make-instance 'old-handler))
   (add-default-thought :cron (do-make-instance 'scheduled-reminder))
