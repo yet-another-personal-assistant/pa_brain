@@ -4,6 +4,7 @@
 (in-package #:com.aragaer.pa-brain)
 (load "commands.lisp")
 (load "config.lisp")
+(load "utils.lisp")
 
 (defvar *maki-uchi-binary*
   (namestring (merge-pathnames "Projects/maki-uchi/maki-uchi" (user-homedir-pathname))))
@@ -27,8 +28,22 @@
    (list *maki-uchi-binary* "-f" *maki-uchi-log-file* arg))
   (append '("good") (maki-uchi-translate (get-maki-uchi-status-lines))))
 
-(defun maki-uchi (arg)
-  (process-command arg (list (cons "status" 'maki-uchi-status)
-			     (cons "log" 'maki-uchi-log))))
+(defclass maki-uchi-thought (thought)
+  ((name :initform :maki-uchi)))
 
-(add-top-level-command "maki-uchi" 'maki-uchi)
+(defmethod react ((thought maki-uchi-thought) event)
+  (let ((intent (getf event :intent)))
+    (if (alexandria:starts-with-subseq "maki-uchi" intent)
+	(let ((action (remove-prefix intent "maki-uchi")))
+	  (loop for line in
+		(cond ((string= "status" action)
+		       (maki-uchi-status nil))
+		      ((alexandria:starts-with-subseq "log" action)
+		       (maki-uchi-log (remove-prefix action "log"))))
+		do (add-response event line))))))
+
+(defmethod process ((thought maki-uchi-thought) event)
+  )
+
+(conspack:defencoding maki-uchi-thought
+		      name)

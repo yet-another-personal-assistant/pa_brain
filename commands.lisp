@@ -10,9 +10,6 @@
 (defmacro add-command (subset command handler)
   `(setq ,subset (acons ,command ,handler ,subset)))
 
-(defun add-top-level-command (command handler)
-  (add-command *top-level-commands* command handler))
-
 (defun process-command (command commands)
   (aif (assoc command commands :test 'starts-with-p)
        (funcall (cdr it) (string-trim " " (subseq command (length (car it)))))))

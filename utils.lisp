@@ -1,7 +1,7 @@
 (in-package #:com.aragaer.pa-brain)
 
 (defun starts-with-p (string1 string2)
-  (string= string1 string2 :end1 (min (length string1) (length string2))))
+  (alexandria:starts-with-subseq string2 string1))
 
 (defmacro aif (test-form then-form &optional else-form)
   `(let ((it ,test-form))
@@ -26,3 +26,6 @@
   `(if (listp ,list-or-value)
        (alexandria:flatten ,list-or-value)
      (list ,list-or-value)))
+
+(defun remove-prefix (string prefix)
+  (string-trim " " (subseq string (length prefix))))

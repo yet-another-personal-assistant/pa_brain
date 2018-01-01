@@ -11,11 +11,15 @@
 	   :save-state
 	   :react
 	   :process
+	   :maki-uchi-log
+	   :maki-uchi-status
+	   :maki-uchi-translate
 	   :greeter
 	   :japanese-reminder
 	   :dont-understand
 	   :scheduled-reminder
 	   :admin-thought
+	   :maki-uchi-thought
 	   :dialog
 	   :finished-p
 	   :mark-finished))

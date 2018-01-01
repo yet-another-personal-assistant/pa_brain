@@ -21,6 +21,7 @@
      (prove:run #P"tests/dialog.lisp" :reporter :list)
      (prove:run #P"tests/dont_understand.lisp" :reporter :list)
      (prove:run #P"tests/cron.lisp" :reporter :list)
-     (prove:run #P"tests/admin.lisp" :reporter :list))
+     (prove:run #P"tests/admin.lisp" :reporter :list)
+     (prove:run #P"tests/maki-uchi.lisp" :reporter :list))
     (format t "PASSED~%")
   (format t "FAILED~%"))
