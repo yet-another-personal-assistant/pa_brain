@@ -41,7 +41,6 @@
 	  (when (member "japanese" modules :test 'string-equal)
 	    (add-default-thought :japanese-reminder (do-make-instance 'japanese-reminder))))))
 
-  (add-default-thought :old (do-make-instance 'old-handler))
   (add-default-thought :cron (do-make-instance 'scheduled-reminder))
   (add-default-thought :greeter (do-make-instance 'greeter))
   (add-default-thought :dont-understand (do-make-instance 'dont-understand))

@@ -13,10 +13,19 @@
       (let ((what (string-trim " " (subseq (getf event :intent) (length "unintelligible")))))
 	(add-modifier event :dont-understand (or (string= "" what) what)))))
 
+(defun known-hello-or-empty-p (event)
+  (let ((intent (getf event :intent))
+	(mods (getf event :modifiers)))
+    (or (assoc-if-not #'(lambda (mod) (equalp mod :hello)) mods)
+	(not intent) ; no intent means an internal event
+	(string= "hello" intent)
+	(string= "" intent))))
+
 (defmethod process ((thought dont-understand) event)
-  (if (get-modifier event :dont-understand)
-      (setf (getf event :response)
-	    (append (getf event :response) '("failed to parse")))))
+  (cond ((get-modifier event :dont-understand)
+	 (add-response event "failed to parse"))
+	((not (known-hello-or-empty-p event))
+	 (add-response event (format nil "unknown command \"~a\"" (getf event :intent))))))
 
 (conspack:defencoding dont-understand
 		      name)

@@ -1,7 +1,6 @@
 (load "package.lisp")
 
 (load "translate.lisp")
-(load "commands.lisp")
 (load "connect.lisp")
 (load "config.lisp")
 (load "utils.lisp")

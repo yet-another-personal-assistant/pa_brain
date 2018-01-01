@@ -2,7 +2,6 @@
 (require :uiop)
 
 (in-package #:com.aragaer.pa-brain)
-(load "commands.lisp")
 (load "config.lisp")
 (load "utils.lisp")
 

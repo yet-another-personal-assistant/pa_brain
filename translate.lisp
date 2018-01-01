@@ -1,5 +1,4 @@
 (load "socket.lisp")
-(load "commands.lisp")
 (load "utils.lisp")
 (load "config.lisp")
 (in-package #:com.aragaer.pa-brain)
