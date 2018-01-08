@@ -35,6 +35,7 @@
       (let ((modules (gethash "modules" *config*)))
 	(when modules
 	  (when (member "maki-uchi" modules :test 'string-equal)
+	    (add-default-thought :maki-uchi (do-make-instance 'maki-uchi-thought))
 	    (setf *maki-uchi-log-file* (gethash "maki-uchi" *config*)))
 	  (when (member "admin" modules :test 'string-equal)
 	    (add-default-thought :admin (do-make-instance 'admin-thought)))

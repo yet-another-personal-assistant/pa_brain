@@ -32,14 +32,15 @@
 
 (defmethod react ((thought maki-uchi-thought) event)
   (let ((intent (getf event :intent)))
-    (if (alexandria:starts-with-subseq "maki-uchi" intent)
-	(let ((action (remove-prefix intent "maki-uchi")))
-	  (loop for line in
-		(cond ((string= "status" action)
-		       (maki-uchi-status nil))
-		      ((alexandria:starts-with-subseq "log" action)
-		       (maki-uchi-log (remove-prefix action "log"))))
-		do (add-response event line))))))
+    (when (alexandria:starts-with-subseq "maki-uchi" intent)
+      (add-modifier event :maki-uchi)
+      (let ((action (remove-prefix intent "maki-uchi")))
+	(loop for line in
+	      (cond ((string= "status" action)
+		     (maki-uchi-status nil))
+		    ((alexandria:starts-with-subseq "log" action)
+		     (maki-uchi-log (remove-prefix action "log"))))
+	      do (add-response event line))))))
 
 (defmethod process ((thought maki-uchi-thought) event)
   )
