@@ -26,6 +26,7 @@ def _await_reply(context):
     while True:
         if '\n' in context.replies:
             result, context.replies = context.replies.split("\n", 1)
+            signal.alarm(0)
             return result
         try:
             message = context.channel.read()
