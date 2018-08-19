@@ -54,6 +54,10 @@ def step_impl(context):
 @then(u'I receive the following line')
 def step_impl(context):
     line = _await_reply(context)
-    message = json.loads(line)
+    try:
+        message = json.loads(line)
+    except json.JSONDecodeError:
+        print("[{}] is not a json string".format(line))
+        raise
     expected = json.loads(context.text)
     eq_(message, expected)

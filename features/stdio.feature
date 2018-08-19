@@ -7,10 +7,10 @@ Feature: Access using STDIO
     When I start the application
      And I send the following line:
        """
-       {"text": "ping", "from": {"user": "user", "channel": "channel"}, "to": {"user": "niege", "channel": "brain"}}
+       {"text": "hello", "from": {"user": "user", "channel": "channel"}, "to": {"user": "niege", "channel": "brain"}}
        """
     Then I receive the following line:
        """
-       {"text": "pong", "from": {"user": "niege", "channel": "brain"}, "to": {"user": "user", "channel": "channel"}}
+       {"text": "hello", "from": {"user": "niege", "channel": "brain"}, "to": {"user": "user", "channel": "channel"}}
       """
        

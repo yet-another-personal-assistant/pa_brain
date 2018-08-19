@@ -9,8 +9,15 @@
 
 (in-package :com.aragaer.pa-brain)
 
-(json:with-object ()
-  (json:encode-object-member :text "pong")
-  (json:as-object-member (:from) (json:encode-json-plist `(:user "niege" :channel "brain")))
-  (json:as-object-member (:to) (json:encode-json-plist `(:user "user" :channel "channel"))))
-(format t "~%")
+(defun get-reply (message)
+  (if (string= message "hello")
+      "hello"
+      "unknown"))
+
+(loop for request = (json:decode-json)
+   for reply = (get-reply (cdr (assoc :text request)))
+   do (json:with-object ()
+	(json:encode-object-member :text reply)
+	(json:as-object-member (:from) (json:encode-json (cdr (assoc :to request))))
+	(json:as-object-member (:to) (json:encode-json (cdr (assoc :from request)))))
+   do (format t "~%"))
