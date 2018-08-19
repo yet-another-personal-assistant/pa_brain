@@ -3,5 +3,14 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
-(format t "~a~%"
- "{\"text\": \"pong\", \"from\": {\"user\": \"niege\", \"channel\": \"brain\"}, \"to\": {\"user\": \"user\", \"channel\": \"channel\"}}")
+(ql:quickload :cl-json :silent t)
+
+(load "package.lisp")
+
+(in-package :com.aragaer.pa-brain)
+
+(json:with-object ()
+  (json:encode-object-member :text "pong")
+  (json:as-object-member (:from) (json:encode-json-plist `(:user "niege" :channel "brain")))
+  (json:as-object-member (:to) (json:encode-json-plist `(:user "user" :channel "channel"))))
+(format t "~%")
