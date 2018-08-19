@@ -9,3 +9,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - License
 - Readme
 - This changelog
+- Makefile for running the code
+- run.lisp is the main entrypoint
