@@ -82,7 +82,15 @@ def step_impl(context):
 @then(u'translator receives the following request')
 def step_impl(context):
     with timeout(1):
-        while not context.tr_messages:
+        while len(context.tr_messages) == context.last_tr_message:
             sleep(0.1)
-    line = context.tr_messages[-1]
+    line = context.tr_messages[context.last_tr_message]
     _compare_json(line, context.text)
+    context.last_tr_message += 1
+
+@given(u'the translation from {f} to {t}')
+def step_impl(context, f, t):
+    dict_name = f+'2'+t
+    translations = context.translations[dict_name]
+    for row in context.table:
+        translations[row[0]] = row[1]

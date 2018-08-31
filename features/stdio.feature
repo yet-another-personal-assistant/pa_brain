@@ -3,6 +3,14 @@ Feature: Access using STDIO
   I want PA brain to work through STDIO
   So that I could deploy the PA easily
 
+  Background: Hello translation
+    Given the translation from human to pa:
+        | text   | intent |
+        | Привет | hello  |
+      And the translation from pa to human:
+        | intent | text          |
+        | hello  | Ой, приветик! |
+
   Scenario: Running
     When I start the application
      And I send the following line:

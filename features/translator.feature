@@ -4,9 +4,15 @@ Feature: Using translator
   So that I could separate natural language code from brain itself
   
   Background: Brain connected to translator
+    Given the translation from human to pa:
+        | text   | intent |
+        | Привет | hello  |
+      And the translation from pa to human:
+        | intent | text     |
+        | hello  | Приветик |
     Given the application is started
-  
-  Scenario: Send to translator
+
+  Scenario: Send human text to translator
      When I send the following line:
        """
        {"message": "Привет",
@@ -17,4 +23,26 @@ Feature: Using translator
        """
        {"text": "Привет"}
        """
+
+  Scenario: Send intent for translation
+     When I send the following line:
+       """
+       {"message": "Привет",
+        "from": {"user": "user", "channel": "channel"},
+        "to": {"user": "niege", "channel": "brain"}}
+       """
+     Then translator receives the following request:
+       """
+       {"text": "Привет"}
+       """
+      And translator receives the following request:
+       """
+       {"intent": "hello"}
+       """
+     Then I receive the following line:
+        """
+        {"message": "Приветик",
+         "from": {"user": "niege", "channel": "brain"},
+         "to": {"user": "user", "channel": "channel"}}
+        """
        

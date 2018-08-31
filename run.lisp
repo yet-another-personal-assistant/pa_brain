@@ -26,10 +26,12 @@
 (with-arg "--translator" (translator-connect value))
 
 (defun get-reply (message)
-  (translate-human2pa message)
-  (if (string= message "Привет")
-      "Ой, приветик!"
-      "unknown"))
+  (let ((intent (translate-human2pa message)))
+    (translate-pa2human
+     (cond ((string= intent "hello")
+	    "hello")
+	   (t
+	    "unknown")))))
 
 (loop for request = (json:decode-json)
    for reply = (get-reply (cdr (assoc :message request)))
