@@ -2,6 +2,9 @@ import json
 import logging
 import signal
 
+from contextlib import contextmanager
+from time import sleep
+
 from behave import *
 from nose.tools import eq_
 
@@ -20,28 +23,36 @@ def _timeout(signum, flame):
     raise Exception("timeout")
 
 
-def _await_reply(context):
+@contextmanager
+def timeout(timeout):
     signal.signal(signal.SIGALRM, _timeout)
-    signal.alarm(1)
-    while True:
-        if '\n' in context.replies:
-            result, context.replies = context.replies.split("\n", 1)
-            signal.alarm(0)
-            return result
-        try:
-            message = context.channel.read()
-        except:
-            break
-        if message:
-            context.replies += message.decode()
-    signal.alarm(0)
+    signal.setitimer(signal.ITIMER_REAL, timeout)
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+
+
+def _await_reply(context):
+    with timeout(1):
+        while True:
+            if '\n' in context.replies:
+                result, context.replies = context.replies.split("\n", 1)
+                return result
+            try:
+                message = context.channel.read()
+            except:
+                break
+            if message:
+                context.replies += message.decode()
     _LOGGER.info("Waited got only [%s]", context.replies)
 
 
+@given('the application is started')
 @when(u'I start the application')
 def step_impl(context):
     context.add_cleanup(_terminate, context, "main")
-    context.runner.start("main")
+    context.runner.start("main", with_args=["--translator", context.tr_socket])
     context.channel = context.runner.get_channel("main")
     context.replies = ""
 
@@ -52,13 +63,26 @@ def step_impl(context):
     context.channel.write(b'\n')
 
 
-@then(u'I receive the following line')
-def step_impl(context):
-    line = _await_reply(context)
+def _compare_json(line, expected):
     try:
         message = json.loads(line)
     except json.JSONDecodeError:
         print("[{}] is not a json string".format(line))
         raise
-    expected = json.loads(context.text)
+    expected = json.loads(expected)
     eq_(message, expected)
+
+
+@then(u'I receive the following line')
+def step_impl(context):
+    line = _await_reply(context)
+    _compare_json(line, context.text)
+
+
+@then(u'translator receives the following request')
+def step_impl(context):
+    with timeout(1):
+        while not context.tr_messages:
+            sleep(0.1)
+    line = context.tr_messages[-1]
+    _compare_json(line, context.text)
