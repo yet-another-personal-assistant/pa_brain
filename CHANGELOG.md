@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Translator is now required for brain to work
 
+### Removed
+- Makefile
+
 ## 0.1.0 - 2018-08-19
 ### Added
 - License
