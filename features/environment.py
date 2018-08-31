@@ -35,15 +35,9 @@ class TranslatorServer:
             self.client, _ = self.server.accept()
             _LOGGER.info("Client connected")
             while self.running:
-                try:
-                    sdata = self.client.recv(1024)
-                except:
-                    break
-                if not sdata:
-                    break
-                data = sdata.decode().strip()
+                data = self.client.recv(1024)
                 if not data:
-                    continue
+                    break
                 self._messages.append(data)
                 event = json.loads(data)
                 if 'text' in event:
@@ -51,16 +45,16 @@ class TranslatorServer:
                                                 "unintelligible")
                     _LOGGER.info("Translator: %s->%s",
                                  event['text'], intent)
-                    result = json.dumps({'intent': intent})
+                    result = {'intent': intent}
                 elif 'intent' in event:
                     text = self._pa2human.get(event['intent'],
                                               "errored")
                     _LOGGER.info("Translator: %s->%s",
                                  event['intent'], text)
-                    result = json.dumps({'text': text})
+                    result = {'text': text}
                 else:
                     result = {"error": "Either 'intent' or 'text' required"}
-                self.client.send(result.encode()+b'\n')
+                self.client.send(json.dumps(result).encode()+b'\n')
             self.client.close()
 
     def stop(self):
