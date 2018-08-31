@@ -7,10 +7,14 @@ Feature: Access using STDIO
     When I start the application
      And I send the following line:
        """
-       {"text": "hello", "from": {"user": "user", "channel": "channel"}, "to": {"user": "niege", "channel": "brain"}}
+       {"message": "Привет",
+        "from": {"user": "user", "channel": "channel"},
+        "to": {"user": "niege", "channel": "brain"}}
        """
     Then I receive the following line:
        """
-       {"text": "hello", "from": {"user": "niege", "channel": "brain"}, "to": {"user": "user", "channel": "channel"}}
+       {"message": "Ой, приветик!",
+        "from": {"user": "niege", "channel": "brain"},
+        "to": {"user": "user", "channel": "channel"}}
       """
        
