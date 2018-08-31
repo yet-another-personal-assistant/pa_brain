@@ -19,8 +19,11 @@ current `pa-brain` implementation.
 ### Requirements
 
 - [quicklisp](https://www.quicklisp.org/beta/)
+- Translator ([pa2human v0.1.0+](https://github.com/aragaer/pa2human) or any other implementation) must be running
 
 ### Development
 
 Higher level tests are written in Gherkin language and are executed
 using [behave](https://behave.readthedocs.io/en/stable/).
+[yet-another-runner](https://github.com/aragaer/runner) is used by
+these tests.
