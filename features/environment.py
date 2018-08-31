@@ -84,7 +84,8 @@ def before_all(context):
     context.translator = TranslatorServer(context.tr_socket,
                                           context.translations,
                                           context.tr_messages)
-    context.tr_thread = Thread(target=context.translator.run_forever, daemon=True)
+    context.tr_thread = Thread(target=context.translator.run_forever,
+                               daemon=True)
     context.tr_thread.start()
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
     while not os.path.exists(context.tr_socket):
@@ -92,11 +93,11 @@ def before_all(context):
         time.sleep(1)
 
     context.runner = Runner()
-    context.runner.update_config({"main": {"command": "sbcl --script run.lisp --quit", "type": "stdio"}})
+    context.runner.add("main", command="sbcl --script run.lisp",
+                       buffering="line")
 
 
 def before_scenario(context, _):
-    context.replies = []
     context.last_tr_message = 0
 
 

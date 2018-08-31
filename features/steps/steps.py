@@ -36,16 +36,9 @@ def timeout(timeout):
 def _await_reply(context):
     with timeout(1):
         while True:
-            if '\n' in context.replies:
-                result, context.replies = context.replies.split("\n", 1)
-                return result
-            try:
-                message = context.channel.read()
-            except:
-                break
+            message = context.channel.read()
             if message:
-                context.replies += message.decode()
-    _LOGGER.info("Waited got only [%s]", context.replies)
+                return message
 
 
 @given('the application is started')
@@ -54,7 +47,6 @@ def step_impl(context):
     context.add_cleanup(_terminate, context, "main")
     context.runner.start("main", with_args=["--translator", context.tr_socket])
     context.channel = context.runner.get_channel("main")
-    context.replies = ""
 
 
 @when(u'I send the following line')
