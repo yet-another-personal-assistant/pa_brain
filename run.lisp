@@ -4,6 +4,7 @@
     (load quicklisp-init)))
 
 (ql:quickload :cl-json :silent t)
+(ql:quickload :unix-opts :silent t)
 
 (load "package.lisp")
 (load "socket.lisp")
@@ -11,19 +12,15 @@
 
 (in-package :com.aragaer.pa-brain)
 
-(defvar *argv* (or
-		#+CLISP *args*
-		#+SBCL sb-ext:*posix-argv*
-		#+LISPWORKS system:*line-arguments-list*
-		#+CMU extensions:*command-line-words*
-		nil))
+(opts:define-opts
+  (:name :translator
+	 :long "translator"
+	 :arg-parser #'identity))
 
-(defmacro with-arg (key &rest body)
-  `(let* ((pos (position ,key *argv* :test 'string-equal))
-	  (value (if pos (elt *argv* (+ pos 1)))))
-     (when value ,@body)))
-
-(with-arg "--translator" (translator-connect value))
+(multiple-value-bind (options free-args)
+  (opts:get-opts)
+  (if (getf options :translator)
+    (translator-connect (getf options :translator))))
 
 (defun get-reply (message)
   (let ((intent (translate-human2pa message)))

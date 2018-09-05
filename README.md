@@ -16,10 +16,27 @@ following fields:
 `from` and `to` fields are not currently used but are required by the
 current `pa-brain` implementation.
 
-### Requirements
+## Requirements
 
 - [quicklisp](https://www.quicklisp.org/beta/)
 - Translator ([pa2human v0.1.0+](https://github.com/aragaer/pa2human) or any other implementation) must be running
+
+### Lisp implementations
+
+Currently supported implementations are SBCL and Clisp.
+
+#### Rawsock
+
+Using Clisp requires `RAWSOCK` feature. Some distributions do not have
+`RAWSOCK` enabled by default, it is possible it is included in `full`
+linkingset. Use the following command to verify if `RAWSOCK` is available:
+
+    clisp --version | grep -o RAWSOCK
+	
+If the result is empty, try
+
+    clisp -K full --version | grep -o RAWSOCK
+
 
 ### Development
 
