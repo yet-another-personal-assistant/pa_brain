@@ -6,9 +6,9 @@
 (ql:quickload :cl-json :silent t)
 (ql:quickload :unix-opts :silent t)
 
+(load "brain.lisp")
 (load "package.lisp")
 (load "socket.lisp")
-(load "translate.lisp")
 
 (in-package :com.aragaer.pa-brain)
 
@@ -21,14 +21,6 @@
   (opts:get-opts)
   (if (getf options :translator)
     (translator-connect (getf options :translator))))
-
-(defun get-reply (message)
-  (let ((intent (translate-human2pa message)))
-    (translate-pa2human
-     (cond ((string= intent "hello")
-	    "hello")
-	   (t
-	    "unknown")))))
 
 (loop for request = (json:decode-json)
    for reply = (get-reply (cdr (assoc :message request)))

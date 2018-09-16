@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Instructions for running using clisp
+- dont-understand response
+- Initial unit test
 
 ### Fixed
 - Argument parsing in clisp
+
+### Changed
+- Brain replies "dont-understand" instead of "unknown"
 
 ## [0.2.0] - 2018-08-31
 ### Added

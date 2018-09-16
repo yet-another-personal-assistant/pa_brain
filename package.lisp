@@ -1,3 +1,3 @@
 (defpackage #:com.aragaer.pa-brain
   (:use #:common-lisp)
-  (:export :main))
+  (:export :react))

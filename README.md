@@ -16,6 +16,12 @@ following fields:
 `from` and `to` fields are not currently used but are required by the
 current `pa-brain` implementation.
 
+## Commands
+Brain currently understands/replies the following:
+
+- `hello` - reply `hello`
+- anything else - reply `dont-understand`
+
 ## Requirements
 
 - [quicklisp](https://www.quicklisp.org/beta/)
@@ -44,3 +50,5 @@ Higher level tests are written in Gherkin language and are executed
 using [behave](https://behave.readthedocs.io/en/stable/).
 [yet-another-runner](https://github.com/aragaer/runner) is used by
 these tests.
+
+Unit-tests are implemented in lisp using `prove` package.
