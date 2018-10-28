@@ -23,9 +23,11 @@
     (translator-connect (getf options :translator))))
 
 (loop for request = (json:decode-json)
-   for reply = (get-reply (cdr (assoc :message request)))
-   do (json:with-object ()
-	(json:encode-object-member :message reply)
-	(json:as-object-member (:from) (json:encode-json (cdr (assoc :to request))))
-	(json:as-object-member (:to) (json:encode-json (cdr (assoc :from request)))))
-   do (format t "~%"))
+   for text = (cdr (assoc :message request))
+   if text
+     do (json:with-object ()
+	  (json:encode-object-member :message (get-reply text))
+	  (json:as-object-member (:from) (json:encode-json (cdr (assoc :to request))))
+	  (json:as-object-member (:to) (json:encode-json (cdr (assoc :from request)))))
+     and do (format *standard-output* "~%")
+     and do (finish-output *standard-output*))
