@@ -1,0 +1,23 @@
+language: python
+python:
+  - "3.6"
+
+env:
+  matrix:
+    # - LISP=allegro
+    # - LISP=ccl
+    - LISP=sbcl
+    - LISP=clisp
+
+matrix:
+  allow_failures:
+    - env: LISP=allegro
+    - env: LISP=ccl
+
+install:
+  - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
+  - pip install -r requirements.txt
+
+script:
+  - make test
+  - behave
