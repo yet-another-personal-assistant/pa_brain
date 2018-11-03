@@ -11,6 +11,7 @@
 (ql:quickload :cl-json :silent t)
 
 (if (and
-     (prove:run #P"tests/dont_understand.lisp" :reporter :list))
+     (prove:run #P"tests/dont_understand.lisp" :reporter :list)
+     (prove:run #P"tests/hello.lisp" :reporter :list))
     (format t "PASSED~%")
   (format t "FAILED~%"))

@@ -14,7 +14,8 @@ following fields:
 - `to`: anything
 
 `from` and `to` fields are not currently used but are required by the
-current `pa-brain` implementation.
+current `pa-brain` implementation. Messages without `message` field
+are silently ignored.
 
 ## Commands
 Brain currently understands/replies the following:

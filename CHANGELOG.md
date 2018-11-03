@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Brain replies "dont-understand" instead of "unknown"
+- Brain ignores messages without the "message" field
 
 ## [0.2.0] - 2018-08-31
 ### Added
