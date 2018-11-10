@@ -34,7 +34,8 @@ Currently all events are silently discarded.
 
 #### Messages
 
-Message is something sent by user. It should have the following fields:
+Message is something sent by user or to user. It should have the
+following fields:
 
 - `message`: text sent by user or pa
 - `from`: object specifying source of this message
