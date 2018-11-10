@@ -15,6 +15,7 @@
 (if (and
      (prove:run #P"tests/active_user.lisp" :reporter :list)
      (prove:run #P"tests/dont_understand.lisp" :reporter :list)
+     (prove:run #P"tests/good_morning.lisp" :reporter :list)
      (prove:run #P"tests/handle_message.lisp" :reporter :list)
      (prove:run #P"tests/hello.lisp" :reporter :list)
      (prove:run #P"tests/presence.lisp" :reporter :list))

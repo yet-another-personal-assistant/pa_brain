@@ -2,7 +2,7 @@ Feature: Don't understand
   As a brain developer
   I want brain to clearly state that it doesn't understand the command
   So that I could learn about unexpected/unimplemented commands
-  
+
   Background: Brain connected to translator
     Given the translation from human to pa:
         | text | intent         |
@@ -12,7 +12,7 @@ Feature: Don't understand
         | dont-understand | dont-understand |
       And the application is started
       And current user is user
-    
+
   Scenario: Unknown command
      When I send the following line:
        """
