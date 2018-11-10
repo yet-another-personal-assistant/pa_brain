@@ -6,16 +6,43 @@ all the communication scenarios.
 ### Protocol
 
 Brain accepts messages on its standard input and writes replies to
-standard output. Messages are one-lined json objects having the
-following fields:
+standard output. Each message is an one-lined json-object. There are
+the following types of messages:
+
+- command: command from some other component of PA to this brain instance
+- event: an external event sent by some other component of PA
+- message: message sent by user
+
+#### Commands
+
+Message with `command` field is considered to be a command from some
+other component. Only one command is currently supported:
+
+##### `switch-user`
+
+Change current active user of this brain instance to the user
+specified in `'user'` field of the message.
+
+#### Events
+
+Message with `event` field is considere to be an event sent by some
+other component. The difference from command is that command is
+something that brain should perform internally, while event is
+something to what brain should react.
+
+Currently all events are silently discarded.
+
+#### Messages
+
+Message is something sent by user. It should have the following fields:
 
 - `message`: text sent by user or pa
-- `from`: anything
-- `to`: anything
+- `from`: object specifying source of this message
+- `to`: can be anything
 
-`from` and `to` fields are not currently used but are required by the
-current `pa-brain` implementation. Messages without `message` field
-are silently ignored.
+`from` field should be an object containing `user` field. If it is
+different from current active user the whole message is silently
+discarded.
 
 ## Commands
 Brain currently understands/replies the following:

@@ -10,8 +10,13 @@
 
 (ql:quickload :cl-json :silent t)
 
+(setf prove:*enable-colors* nil)
+
 (if (and
+     (prove:run #P"tests/active_user.lisp" :reporter :list)
      (prove:run #P"tests/dont_understand.lisp" :reporter :list)
-     (prove:run #P"tests/hello.lisp" :reporter :list))
+     (prove:run #P"tests/handle_message.lisp" :reporter :list)
+     (prove:run #P"tests/hello.lisp" :reporter :list)
+     (prove:run #P"tests/presence.lisp" :reporter :list))
     (format t "PASSED~%")
   (format t "FAILED~%"))

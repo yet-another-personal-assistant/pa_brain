@@ -15,6 +15,10 @@ Feature: Access using STDIO
     When I start the application
      And I send the following line:
        """
+       {"command": "switch-user", "user": "user"}
+       """
+     And I send the following line:
+       """
        {"event": "presence",
         "from": {"user": "user", "channel": "channel"},
         "to": {"user": "niege", "channel": "brain"}}

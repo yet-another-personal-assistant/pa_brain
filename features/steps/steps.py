@@ -19,8 +19,12 @@ def _terminate(context, alias):
         _LOGGER.debug("%s was not started", alias)
 
 
+class TimeoutException(Exception):
+    pass
+
+
 def _timeout(signum, flame):
-    raise Exception("timeout")
+    raise TimeoutException()
 
 
 @contextmanager
@@ -86,3 +90,22 @@ def step_impl(context, f, t):
     translations = context.translations[dict_name]
     for row in context.table:
         translations[row[0]] = row[1]
+
+@then("I don't get any reply")
+def step_impl(context):
+    try:
+        line = _await_reply(context)
+        print("Got a message when no message is expected: ", line)
+        assert False
+    except TimeoutException as ex:
+        pass
+
+
+@given("current user is {user}")
+def step_impl(context, user):
+    context.execute_steps('''
+    When I send the following line:
+       """
+       {"command": "switch-user", "user": "%s"}
+       """
+    ''' % user)

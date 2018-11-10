@@ -11,6 +11,7 @@ Feature: Using translator
         | intent | text     |
         | hello  | Приветик |
     Given the application is started
+      And current user is user
 
   Scenario: Send human text to translator
      When I send the following line:

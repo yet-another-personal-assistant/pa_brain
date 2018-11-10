@@ -22,12 +22,20 @@
   (if (getf options :translator)
     (translator-connect (getf options :translator))))
 
-(loop for request = (json:decode-json)
-   for text = (cdr (assoc :message request))
-   if text
-     do (json:with-object ()
-	  (json:encode-object-member :message (get-reply text))
-	  (json:as-object-member (:from) (json:encode-json (cdr (assoc :to request))))
-	  (json:as-object-member (:to) (json:encode-json (cdr (assoc :from request)))))
-     and do (format *standard-output* "~%")
-     and do (finish-output *standard-output*))
+(loop for message = (json:decode-json)
+   do (loop for response on (handle-message message
+					    :pa2human 'translate-pa2human
+					    :human2pa 'translate-human2pa)
+	 do (json:encode-json response)
+	 do (format *standard-output* "~%")
+	 do (finish-output *standard-output*)))
+
+;(loop for request = (json:decode-json)
+   ;for text = (cdr (assoc :message request))
+   ;if text
+     ;do (json:with-object ()
+	  ;(json:encode-object-member :message (get-reply text))
+	  ;(json:as-object-member (:from) (json:encode-json (cdr (assoc :to request))))
+	  ;(json:as-object-member (:to) (json:encode-json (cdr (assoc :from request)))))
+     ;and do (format *standard-output* "~%")
+     ;and do (finish-output *standard-output*))

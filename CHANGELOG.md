@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Brain now accepts commands
+- 'switch-user' command
+
+### Changed
+- Brain instance now has an "active-user"
+  - Messages from other users are discarded
+  - Active user can be changed with 'switch-user' command
 
 ## [0.3.0] - 2018-11-04
 ### Added

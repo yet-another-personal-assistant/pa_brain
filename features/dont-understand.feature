@@ -11,6 +11,7 @@ Feature: Don't understand
         | intent          | text            |
         | dont-understand | dont-understand |
       And the application is started
+      And current user is user
     
   Scenario: Unknown command
      When I send the following line:
