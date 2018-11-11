@@ -14,19 +14,37 @@
        (to '((:user . "niege") (:channel . "brain")))
        (message `((:message . "hello") (:from . ,from) (:to . ,to)))
        (activate-message `((:command . "switch-user") (:user . "user1"))))
-  (setf *active-user* nil)
-  (is (handle-message message :pa2human 'identity :human2pa 'identity) ())
+  (subtest "no active user"
+           (set-user nil)
+           (is (handle-message message) ()))
 
-  (setf *active-user* nil)
-  (is (handle-message '((:command . "no-op") (:user "user1")) :pa2human 'identity :human2pa 'identity) ())
-  (is *active-user* nil)
+  (subtest "no-op command"
+           (set-user nil)
+           (is (handle-message '((:command . "no-op") (:user "user1"))) ())
+           (is (handle-message message) ()))
 
-  (setf *active-user* nil)
-  (handle-message activate-message)
-  (is *active-user* "user1")
-  ;(is (handle-message message :pa2human 'identity :human2pa 'identity) ())
+  (subtest "active user"
+           (set-user nil)
+           (handle-message activate-message)
+           (handle-message `((:event . "presence") (:from . ,from)))
+           (let* ((result (handle-message message))
+                  (msg (car result)))
+             (is (assoc :message msg) '(:message . "hello"))
+             (is (assoc :from msg) `(:from . ,to))
+             (is (assoc :to msg) `(:to . ,from))))
 
-  (setf *active-user* "user2")
-  (is (handle-message message :pa2human 'identity :human2pa 'identity) ()))
+  (subtest "other user"
+           (set-user "user2")
+           (is (handle-message message) ()))
 
+  (subtest "other user presence"
+           (set-user "user1")
+           (handle-message `((:event . "presence") (:from . ,from)))
+           (handle-message '((:event . "presence")
+                             (:from . ((:user . "user2") (:channel . "other channel")))))
+           (let* ((result (handle-message message))
+                  (msg (car result)))
+             (is (assoc :message msg) '(:message . "hello"))
+             (is (assoc :from msg) `(:from . ,to))
+             (is (assoc :to msg) `(:to . ,from)))))
 (finalize)

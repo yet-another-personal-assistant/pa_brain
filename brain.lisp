@@ -1,53 +1,79 @@
 (load "package.lisp")
 (load "translate.lisp")
+(load "utils.lisp")
 
 (in-package :com.aragaer.pa-brain)
 
-(defun get-reply (message)
-  (translate-pa2human (react (translate-human2pa message))))
-
 (defun react (intent)
   (cond ((string= intent "hello")
-	 "hello")
-	(t
-	 "dont-understand")))
-
-(defun assoc-value (key a-list)
-  (cdr (assoc key a-list)))
+         "hello")
+        (t
+         "dont-understand")))
 
 (defvar *active-user* nil)
+(defvar *queued* nil)
+(defvar *active-channel* nil)
+
+(defun set-user (user)
+  (setf *active-user* user
+        *queued* nil
+        *active-channel* nil))
+
+(defvar *human2pa* 'identity)
+(defvar *pa2human* 'identity)
 
 (defun handle-command (message)
-  (if (string= "switch-user" (assoc-value :command message))
-      (setf *active-user* (assoc-value :user message)))
+  (switch ((assoc-value :command message) :test 'string=)
+          ("switch-user"
+           (setf *active-user* (assoc-value :user message))
+           nil)
+          ("say"
+           `(((:message . ,(assoc-value :text message)))))))
+
+(defun handle-event-new-day (message)
+  '(((:intent . "good morning"))))
+
+(defun handle-event-presence (message)
+  (setf *active-channel* (traverse-a-list message :from :channel))
   nil)
 
 (defun handle-event (message)
-  (if (string= "new-day" (assoc-value :event message))
-      `(((:intent . "good morning")
-	 (:from . ,(assoc-value :to message))
-	 (:to . ,(assoc-value :from message))))))
+  (switch ((assoc-value :event message) :test 'string=)
+          ("new-day" (handle-event-new-day message))
+          ("presence" (handle-event-presence message))))
 
-(defun handle-user-message (message human2pa)
+(defun handle-user-message (message)
   (let* ((from (assoc-value :from message))
-	 (user (assoc-value :user from)))
-    (if (string= *active-user* user)
-	(let* ((text (assoc-value :message message))
-	       (intent (funcall human2pa text)))
-	  `(((:intent . ,(react intent))
-	     (:from . ,(assoc-value :to message))
-	     (:to . ,(assoc-value :from message))))))))
+         (intent (funcall *human2pa* (assoc-value :message message))))
+    (list (acons :intent (react intent)
+                 (if from (acons :to from nil))))))
 
-(defun translate-to-human (message pa2human)
-  (if (assoc :intent message)
-      (let ((intent (assoc :intent message)))
-	(acons :message (funcall pa2human (cdr intent))
-	       (remove intent message)))
-      message))
+(defun translate-to-human (message)
+  (when-let (intent (assoc :intent message))
+    (rplaca intent :message)
+    (rplacd intent (funcall *pa2human* (cdr intent))))
+  message)
 
-(defun handle-message (message &key pa2human human2pa)
-  (mapcar #'(lambda (message) (translate-to-human message pa2human))
-	  (cond
-	    ((assoc :command message) (handle-command message))
-	    ((assoc :event message) (handle-event message))
-	    (t (handle-user-message message human2pa)))))
+(defun add-source (message)
+  (add-or-create message :from '((:user . "niege")
+                                 (:channel . "brain"))))
+
+(defun add-dest (message)
+  (add-or-create message :to `((:user . ,*active-user*)
+                               (:channel . ,*active-channel*))))
+
+(defun correct-user-p (message)
+  (string= *active-user*
+           (traverse-a-list message :from :user)))
+
+(defun handle-message (message)
+  (let ((new (cond
+               ((assoc :command message) (handle-command message))
+               ((not (correct-user-p message)) nil)
+               ((assoc :event message) (handle-event message))
+               (t (handle-user-message message)))))
+    (mapcar (compose 'add-source 'add-dest 'translate-to-human)
+            (loop for msg in (append *queued* new)
+               if (or *active-channel* (assoc :to msg)) collect msg
+               else collect msg into keep
+               finally (setf *queued* keep)))))

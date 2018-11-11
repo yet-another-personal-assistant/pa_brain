@@ -20,9 +20,30 @@ Feature: Good morning
       And I send the following line:
         """
         {"event": "new-day",
-         "from": {"user": "user", "channel": "channel"},
+         "from": {"user": "user", "channel": "incoming"},
          "to": {"user": "niege", "channel": "brain"}}
         """
+      Then I receive the following line:
+        """
+        {"message": "Morning!",
+         "from": {"user": "niege", "channel": "brain"},
+         "to": {"user": "user", "channel": "channel"}}
+        """
+
+  Scenario: Inactive channel
+     When I send the following line:
+        """
+        {"event": "new-day",
+         "from": {"user": "user", "channel": "incoming"},
+         "to": {"user": "niege", "channel": "brain"}}
+        """
+     Then I don't get any reply
+     When I send the following line:
+       """
+       {"event": "presence",
+        "from": {"user": "user", "channel": "channel"},
+        "to": {"user": "niege", "channel": "brain"}}
+       """
       Then I receive the following line:
         """
         {"message": "Morning!",

@@ -10,12 +10,12 @@
 (in-package #:presence-test)
 (plan nil)
 
-(setf *active-user* "user")
+(set-user "user")
 
 (let* ((from '((:user . "user") (:channel . "channel")))
        (to '((:user . "niege") (:channel . "brain")))
        (message `((:event . "presence") (:from . ,from) (:to . ,to))))
-  (let ((result (handle-message message :human2pa 'identity :pa2human 'identity)))
+  (let ((result (handle-message message)))
     (is result '())))
 
 (finalize)

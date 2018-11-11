@@ -3,7 +3,16 @@
 This is the brain behind my virtual personal assistant. It implements
 all the communication scenarios.
 
-### Protocol
+## Active user/channel
+
+Single instance of the brain only handles a single user. See
+`switch-user` command below.
+
+For active user there is a single "active channel". When brain reacts
+to a message or event it uses this "active channel" to fill the
+`channel` field in `to` object.
+
+## Protocol
 
 Brain accepts messages on its standard input and writes replies to
 standard output. Each message is an one-lined json-object. There are
@@ -13,37 +22,55 @@ the following types of messages:
 - event: an external event sent by some other component of PA
 - message: message sent by user
 
-#### Commands
+### Commands
 
 Message with `command` field is considered to be a command from some
-other component. Only one command is currently supported:
+other component. The following commands are supported:
 
-##### `switch-user`
+#### `switch-user`
 
 Change current active user of this brain instance to the user
 specified in `'user'` field of the message.
 
-#### Events
+#### `say`
+
+Sends message specified in `'text'` field of the message to the
+current user through the current active channel.
+
+### Events
 
 Message with `event` field is considere to be an event sent by some
 other component. The difference from command is that command is
 something that brain should perform internally, while event is
-something to what brain should react.
+something to what brain should react. The following events are
+supported:
 
-Currently all events are silently discarded.
+#### `presence`
 
-#### Messages
+Sets the active channel to the same channel that is the source of this
+message.
+
+#### `new-day`
+
+Queues/Sends `'good morning'` message to active user.
+
+### Messages
 
 Message is something sent by user or to user. It should have the
 following fields:
 
 - `message`: text sent by user or pa
 - `from`: object specifying source of this message
-- `to`: can be anything
+- `to`: object specifying destination of this message
 
-`from` field should be an object containing `user` field. If it is
-different from current active user the whole message is silently
-discarded.
+If message is received by the brain `from` field should be an object
+containing `user` field. If it is different from current active user
+the whole message is silently discarded.
+
+Messages sent by brain have `from` equal to `{"user": "niege",
+"channel": "brain"}`. If message is a reaction to user message `to` is
+equal to `from` of that user message. Otherwise the `channel` in `to`
+object is set to current active channel.
 
 ## Commands
 Brain currently understands/replies the following:

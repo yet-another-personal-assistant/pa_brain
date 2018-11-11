@@ -8,11 +8,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Brain now accepts commands
 - 'switch-user' command
+- 'say' command
+- Brain now handles events
+- 'new-day' event
+- 'presence' event
+- Brain now sends a 'good morning' message when 'new-day' event occurs
 
 ### Changed
-- Brain instance now has an "active-user"
+- Brain instance now has an "active user"
   - Messages from other users are discarded
   - Active user can be changed with 'switch-user' command
+- Brain now remembers "active channel"
+  - Messages are sent to that channel unless it's a response to another message
+  - Active channel can be changed with 'presence' event
 
 ## [0.3.0] - 2018-11-04
 ### Added
