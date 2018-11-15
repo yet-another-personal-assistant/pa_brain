@@ -1,3 +1,4 @@
 behave
 nose
+yet-another-io-channels-library>=0.2.2
 yet-another-runner>=0.3.0

@@ -11,6 +11,7 @@ from tempfile import mkdtemp
 from threading import Thread
 
 from runner import Runner
+from channels.poller import Poller
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,36 +27,36 @@ class TranslatorServer:
         self._human2pa = translations['human2pa']
         self._pa2human = translations['pa2human']
         self._messages = messages
+        self.poller = Poller()
 
     def run_forever(self):
         self.server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.server.bind(self.path)
         self.server.listen()
+        self.poller.add_server(self.server)
         while self.running:
-            self.client, _ = self.server.accept()
-            _LOGGER.info("Client connected")
-            while self.running:
-                data = self.client.recv(1024)
-                if not data:
-                    break
-                self._messages.append(data)
-                event = json.loads(data)
-                if 'text' in event:
-                    intent = self._human2pa.get(event['text'],
-                                                "unintelligible")
-                    _LOGGER.info("Translator: %s->%s",
-                                 event['text'], intent)
-                    result = {'intent': intent}
-                elif 'intent' in event:
-                    text = self._pa2human.get(event['intent'],
-                                              "errored")
-                    _LOGGER.info("Translator: %s->%s",
-                                 event['intent'], text)
-                    result = {'text': text}
-                else:
-                    result = {"error": "Either 'intent' or 'text' required"}
-                self.client.send(json.dumps(result).encode()+b'\n')
-            self.client.close()
+            for data, channel in self.poller.poll():
+                if channel == self.server:
+                    _LOGGER.info("Client connected")
+                elif data:
+                    _LOGGER.debug("Data: %r", data)
+                    self._messages.append(data)
+                    event = json.loads(data)
+                    if 'text' in event:
+                        intent = self._human2pa.get(event['text'],
+                                                    "unintelligible")
+                        _LOGGER.info("Translator: %s->%s",
+                                     event['text'], intent)
+                        result = {'intent': intent}
+                    elif 'intent' in event:
+                        text = self._pa2human.get(event['intent'],
+                                                  "errored")
+                        _LOGGER.info("Translator: %s->%s",
+                                     event['intent'], text)
+                        result = {'text': text}
+                    else:
+                        result = {"error": "Either 'intent' or 'text' required"}
+                    channel.write(json.dumps(result).encode()+b'\n')
 
     def stop(self):
         self.running = False
@@ -93,6 +94,7 @@ def before_all(context):
 
 def before_scenario(context, _):
     context.last_tr_message = 0
+    context.poller = Poller()
 
 
 def after_scenario(context, _):
@@ -100,3 +102,4 @@ def after_scenario(context, _):
     context.tr_messages.clear()
     context.translations['pa2human'].clear()
     context.translations['human2pa'].clear()
+    context.poller.close_all()

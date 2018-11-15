@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from time import sleep
 
 from behave import *
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -38,11 +38,13 @@ def timeout(timeout):
 
 
 def _await_reply(context):
-    with timeout(1):
-        while True:
-            message = context.channel.read()
-            if message:
-                return message
+    for data, channel in context.poller.poll(1):
+        _LOGGER.debug("Got data %r from channel %s", data, channel)
+        if channel == context.channel:
+            _LOGGER.debug("Returning %r", data)
+            return data
+        else:
+            _LOGGER.debug("Discarding %r", data)
 
 
 @given('the application is started')
@@ -51,6 +53,7 @@ def step_impl(context):
     context.add_cleanup(_terminate, context, "main")
     context.runner.start("main", with_args=["--translator", context.tr_socket])
     context.channel = context.runner.get_channel("main")
+    context.poller.register(context.channel)
 
 
 @when(u'I send the following line')
@@ -62,7 +65,7 @@ def step_impl(context):
 def _compare_json(line, expected):
     try:
         message = json.loads(line)
-    except json.JSONDecodeError:
+    except (TypeError, json.JSONDecodeError):
         print("[{}] is not a json string".format(line))
         raise
     expected = json.loads(expected)
@@ -72,6 +75,7 @@ def _compare_json(line, expected):
 @then(u'I receive the following line')
 def step_impl(context):
     line = _await_reply(context)
+    ok_(line is not None)
     _compare_json(line, context.text)
 
 
@@ -84,6 +88,7 @@ def step_impl(context):
     _compare_json(line, context.text)
     context.last_tr_message += 1
 
+
 @given(u'the translation from {f} to {t}')
 def step_impl(context, f, t):
     dict_name = f+'2'+t
@@ -91,14 +96,13 @@ def step_impl(context, f, t):
     for row in context.table:
         translations[row[0]] = row[1]
 
+
 @then("I don't get any reply")
 def step_impl(context):
-    try:
-        line = _await_reply(context)
+    line = _await_reply(context)
+    if line is not None:
         print("Got a message when no message is expected: ", line)
         assert False
-    except TimeoutException as ex:
-        pass
 
 
 @given("current user is {user}")

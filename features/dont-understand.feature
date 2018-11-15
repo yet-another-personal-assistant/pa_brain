@@ -26,4 +26,3 @@ Feature: Don't understand
          "from": {"user": "niege", "channel": "brain"},
          "to": {"user": "user", "channel": "channel"}}
         """
-       
