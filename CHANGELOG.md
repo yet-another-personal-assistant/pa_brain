@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Brain now handles events
 - 'new-day' event
 - 'presence' event
+- 'gone' event
 - Brain now sends a 'good morning' message when 'new-day' event occurs
 
 ### Changed
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Brain now remembers "active channel"
   - Messages are sent to that channel unless it's a response to another message
   - Active channel can be changed with 'presence' event
+  - Active channel can be unset with 'gone' event
 
 ## [0.3.0] - 2018-11-04
 ### Added

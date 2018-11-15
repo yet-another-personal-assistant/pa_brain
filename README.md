@@ -50,6 +50,11 @@ supported:
 Sets the active channel to the same channel that is the source of this
 message.
 
+#### `gone`
+
+Removes active channel if it is the same as the source of this
+message.
+
 #### `new-day`
 
 Queues/Sends `'good morning'` message to active user.
