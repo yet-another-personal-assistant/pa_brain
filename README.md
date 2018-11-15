@@ -1,4 +1,4 @@
-# Personal Assistant brain [![Build Status](https://travis-ci.org/aragaer/pa_brain.svg?branch=master)](https://travis-ci.org/aragaer/pa_brain)
+# Personal Assistant brain [![Build Status](https://travis-ci.com/aragaer/pa_brain.svg?branch=master)](https://travis-ci.com/aragaer/pa_brain)
 
 This is the brain behind my virtual personal assistant. It implements
 all the communication scenarios.
