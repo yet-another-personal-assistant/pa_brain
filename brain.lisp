@@ -42,10 +42,12 @@
       (setf *active-channel* nil)))
 
 (defun handle-event (message)
-  (switch ((assoc-value :event message) :test 'string=)
-          ("new-day" (handle-event-new-day message))
-          ("presence" (handle-event-presence message))
-          ("gone" (handle-event-gone message))))
+  (funcall
+   (switch ((assoc-value :event message) :test 'string=)
+           ("new-day" 'handle-event-new-day)
+           ("presence" 'handle-event-presence)
+           ("gone" 'handle-event-gone))
+   message))
 
 (defun handle-user-message (message)
   (let* ((from (assoc-value :from message))
