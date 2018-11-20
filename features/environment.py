@@ -27,7 +27,7 @@ class TranslatorServer:
         self._human2pa = translations['human2pa']
         self._pa2human = translations['pa2human']
         self._messages = messages
-        self.poller = Poller()
+        self.poller = Poller(buffering='line')
 
     def run_forever(self):
         self.server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -94,7 +94,7 @@ def before_all(context):
 
 def before_scenario(context, _):
     context.last_tr_message = 0
-    context.poller = Poller()
+    context.poller = Poller(buffering='line')
 
 
 def after_scenario(context, _):

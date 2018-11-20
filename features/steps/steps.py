@@ -58,8 +58,7 @@ def step_impl(context):
 
 @when(u'I send the following line')
 def step_impl(context):
-    context.channel.write(context.text.encode())
-    context.channel.write(b'\n')
+    context.channel.write(context.text.encode(), b'\n')
 
 
 def _compare_json(line, expected):
