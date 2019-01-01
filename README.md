@@ -90,7 +90,7 @@ Brain currently understands/replies the following:
 
 ### Lisp implementations
 
-Currently supported implementations are SBCL and Clisp.
+Currently supported implementations are SBCL and Clisp (somewhat...).
 
 #### Rawsock
 
@@ -99,7 +99,7 @@ Using Clisp requires `RAWSOCK` feature. Some distributions do not have
 linkingset. Use the following command to verify if `RAWSOCK` is available:
 
     clisp --version | grep -o RAWSOCK
-	
+
 If the result is empty, try
 
     clisp -K full --version | grep -o RAWSOCK

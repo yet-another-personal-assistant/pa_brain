@@ -28,6 +28,7 @@
       *human2pa* 'translate-human2pa)
 
 (loop for message = (json:decode-json)
+   do (format *error-output* "Got [~a]~%" message)
    do (loop for response in (handle-message message)
          do (json:encode-json response)
          do (format *standard-output* "~%")

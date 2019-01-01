@@ -19,11 +19,12 @@ _LOGGER = logging.getLogger(__name__)
 
 class TranslatorServer:
 
-    def __init__(self, path, translations, messages):
+    def __init__(self, path, tcp_addr, translations, messages):
         self.running = True
         self.server = None
         self.client = None
         self.path = path
+        self.addr = tcp_addr
         self._human2pa = translations['human2pa']
         self._pa2human = translations['pa2human']
         self._messages = messages
@@ -34,9 +35,14 @@ class TranslatorServer:
         self.server.bind(self.path)
         self.server.listen()
         self.poller.add_server(self.server)
+        self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.tcp.bind(self.addr)
+        self.tcp.listen()
+        self.poller.add_server(self.tcp)
+        self.addr = self.tcp.getsockname()
         while self.running:
             for data, channel in self.poller.poll():
-                if channel == self.server:
+                if channel in (self.server, self.tcp):
                     _LOGGER.info("Client connected")
                 elif data:
                     _LOGGER.debug("Data: %r", data)
@@ -62,6 +68,8 @@ class TranslatorServer:
         self.running = False
         if self.server is not None:
             self.server.close()
+        if self.tcp is not None:
+            self.tcp.close()
         if self.client is not None:
             self.client.close()
 
@@ -77,6 +85,7 @@ def before_all(context):
     context.translations = {'pa2human':{}, 'human2pa': {}}
     context.tr_messages = []
     context.translator = TranslatorServer(context.tr_socket,
+                                          ('0.0.0.0', 0),
                                           context.translations,
                                           context.tr_messages)
     context.tr_thread = Thread(target=context.translator.run_forever,

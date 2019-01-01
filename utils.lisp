@@ -12,6 +12,6 @@
 
 (defun traverse-a-list (a-list &rest fields)
   (reduce 'assoc-value
-	  (reverse fields)
-	  :from-end t
-	  :initial-value a-list))
+          (reverse fields)
+          :from-end t
+          :initial-value a-list))

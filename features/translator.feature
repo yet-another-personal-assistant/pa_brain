@@ -2,7 +2,7 @@ Feature: Using translator
   As an author of PA's natural language code
   I want PA brain to work with translator
   So that I could separate natural language code from brain itself
-  
+
   Background: Brain connected to translator
     Given the translation from human to pa:
         | text   | intent |
@@ -46,4 +46,17 @@ Feature: Using translator
          "from": {"user": "niege", "channel": "brain"},
          "to": {"user": "user", "channel": "channel"}}
         """
-       
+
+  @tcp_translator
+  Scenario: Using TCP socket
+     When I send the following line:
+       """
+       {"message": "Привет",
+        "from": {"user": "user", "channel": "channel"},
+        "to": {"user": "niege", "channel": "brain"}}
+       """
+     Then translator receives the following request:
+       """
+       {"text": "Привет"}
+       """
+

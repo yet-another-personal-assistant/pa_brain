@@ -50,8 +50,12 @@ def _await_reply(context):
 @given('the application is started')
 @when(u'I start the application')
 def step_impl(context):
+    if 'tcp_translator' in context.tags:
+        sockname = '{}:{}'.format(*context.translator.addr)
+    else:
+        sockname = context.tr_socket
     context.add_cleanup(_terminate, context, "main")
-    context.runner.start("main", with_args=["--translator", context.tr_socket])
+    context.runner.start("main", with_args=["--translator", sockname])
     context.channel = context.runner.get_channel("main")
     context.poller.register(context.channel)
 
@@ -84,6 +88,7 @@ def step_impl(context):
         while len(context.tr_messages) == context.last_tr_message:
             sleep(0.1)
     line = context.tr_messages[context.last_tr_message]
+    _LOGGER.debug("Translator got [%s]", line)
     _compare_json(line, context.text)
     context.last_tr_message += 1
 
