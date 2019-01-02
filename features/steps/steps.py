@@ -1,12 +1,11 @@
-import json
 import logging
-import signal
 
-from contextlib import contextmanager
 from time import sleep
 
 from behave import *
 from nose.tools import eq_, ok_
+
+from utils import compare_json, timeout
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -17,24 +16,6 @@ def _terminate(context, alias):
         context.runner.terminate(alias)
     except KeyError:
         _LOGGER.debug("%s was not started", alias)
-
-
-class TimeoutException(Exception):
-    pass
-
-
-def _timeout(signum, flame):
-    raise TimeoutException()
-
-
-@contextmanager
-def timeout(timeout):
-    signal.signal(signal.SIGALRM, _timeout)
-    signal.setitimer(signal.ITIMER_REAL, timeout)
-    try:
-        yield
-    finally:
-        signal.setitimer(signal.ITIMER_REAL, 0)
 
 
 def _await_reply(context):
@@ -65,21 +46,11 @@ def step_impl(context):
     context.channel.write(context.text.encode(), b'\n')
 
 
-def _compare_json(line, expected):
-    try:
-        message = json.loads(line)
-    except (TypeError, json.JSONDecodeError):
-        print("[{}] is not a json string".format(line))
-        raise
-    expected = json.loads(expected)
-    eq_(message, expected)
-
-
 @then(u'I receive the following line')
 def step_impl(context):
     line = _await_reply(context)
     ok_(line is not None)
-    _compare_json(line, context.text)
+    compare_json(line, context.text)
 
 
 @then(u'translator receives the following request')
@@ -89,7 +60,7 @@ def step_impl(context):
             sleep(0.1)
     line = context.tr_messages[context.last_tr_message]
     _LOGGER.debug("Translator got [%s]", line)
-    _compare_json(line, context.text)
+    compare_json(line, context.text)
     context.last_tr_message += 1
 
 

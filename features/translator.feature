@@ -59,4 +59,3 @@ Feature: Using translator
        """
        {"text": "Привет"}
        """
-

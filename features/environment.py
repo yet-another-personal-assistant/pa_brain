@@ -100,10 +100,14 @@ def before_all(context):
     context.runner.add("main", command="sbcl --script run.lisp",
                        buffering="line")
 
+    # FIXME: using the hardcoded address here
+    context.alt_sockaddr = ('0.0.0.0', 18011)
+
 
 def before_scenario(context, _):
     context.last_tr_message = 0
     context.poller = Poller(buffering='line')
+    context.alt_serv = None
 
 
 def after_scenario(context, _):
@@ -112,3 +116,5 @@ def after_scenario(context, _):
     context.translations['pa2human'].clear()
     context.translations['human2pa'].clear()
     context.poller.close_all()
+    if context.alt_serv is not None:
+        context.alt_serv.close()
