@@ -2,14 +2,25 @@
 (in-package #:com.aragaer.pa-brain)
 
 (defvar *translator-io* nil)
+(defvar *translator-addr* nil)
 
-(defun translator-connect (socket-path)
-  (setf *translator-io* (create-socket-stream socket-path)))
+(defun translator-connect ()
+  (setf *translator-io* (create-socket-stream *translator-addr*)))
+
+(defun translator-send (plist)
+  (handler-case (progn (json:encode-json-plist plist *translator-io*)
+                       (format *translator-io* "~%"))
+    #+sbcl
+    (sb-int:simple-stream-error (se)
+      (translator-connect)
+      (translator-send plist))))
 
 (defun translate (message key result-key)
-  (json:encode-json-plist (list key message) *translator-io*)
-  (format *translator-io* "~%")
-  (cdr (assoc result-key (json:decode-json *translator-io*))))
+  (handler-case (progn (translator-send (list key message))
+                       (cdr (assoc result-key (json:decode-json *translator-io*))))
+    (end-of-file (se)
+      (translator-connect)
+      (translate message key result-key))))
 
 (defun translate-pa2human (message)
   (translate message :intent :text))

@@ -20,8 +20,13 @@
   (error "not implemented"))
 
 (defun create-socket-stream (addr)
-  (if-let ((colon (position #\: addr)))
-      (let ((host (subseq addr 0 colon))
-            (port (parse-integer (subseq addr (+ 1 colon)))))
-        (create-tcp-socket-stream host port))
-    (create-unix-socket-stream addr)))
+  (handler-case
+      (if-let ((colon (position #\: addr)))
+          (let ((host (subseq addr 0 colon))
+                (port (parse-integer (subseq addr (+ 1 colon)))))
+            (create-tcp-socket-stream host port))
+        (create-unix-socket-stream addr))
+    #+sbcl
+    (sb-bsd-sockets:socket-error ()
+      (sleep 0.1)
+      (create-socket-stream addr))))

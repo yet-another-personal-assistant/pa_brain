@@ -35,8 +35,11 @@ def step_impl(context):
         sockname = '{}:{}'.format(*context.translator.addr)
     else:
         sockname = context.tr_socket
+    args = ["--translator", sockname]
+    if 'tcp_router' in context.tags:
+        args.extend(["--router", "{}:{}".format(*context.router_addr)])
     context.add_cleanup(_terminate, context, "main")
-    context.runner.start("main", with_args=["--translator", sockname])
+    context.runner.start("main", with_args=args)
     context.channel = context.runner.get_channel("main")
     context.poller.register(context.channel)
 
@@ -80,6 +83,7 @@ def step_impl(context):
         assert False
 
 
+@when("the user is switched to {user}")
 @given("current user is {user}")
 def step_impl(context, user):
     context.execute_steps('''

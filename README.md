@@ -3,6 +3,14 @@
 This is the brain behind my virtual personal assistant. It implements
 all the communication scenarios.
 
+## Arguments
+
+- `--translator` specifies address of running translator service. It
+  could be a UNIX socket path or TCP host:port pair.
+- `--router` (optional) specifies address of router to connect
+  to. UNIX socket path or TCP host:port pair. If not specified, STDIO
+  is used.
+
 ## Active user/channel
 
 Single instance of the brain only handles a single user. See
@@ -14,9 +22,9 @@ to a message or event it uses this "active channel" to fill the
 
 ## Protocol
 
-Brain accepts messages on its standard input and writes replies to
-standard output. Each message is an one-lined json-object. There are
-the following types of messages:
+Brain accepts messages from router and sends back replies. Each
+message is an one-lined json-object. There are the following types of
+messages:
 
 - command: command from some other component of PA to this brain instance
 - event: an external event sent by some other component of PA

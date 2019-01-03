@@ -100,8 +100,9 @@ def before_all(context):
     context.runner.add("main", command="sbcl --script run.lisp",
                        buffering="line")
 
-    # FIXME: using the hardcoded address here
+    # FIXME: using hardcoded addresses here
     context.alt_sockaddr = ('0.0.0.0', 18011)
+    context.router_addr = ('0.0.0.0', 18012)
 
 
 def before_scenario(context, _):
