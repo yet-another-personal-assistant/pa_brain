@@ -1,5 +1,10 @@
 (in-package #:com.aragaer.pa-brain)
 
+#+sbcl
+(defun resolve-host (name)
+  (car (sb-bsd-sockets:host-ent-addresses
+        (sb-bsd-sockets:get-host-by-name name))))
+
 (defun create-unix-socket-stream (socket-path)
   #+rawsock
   (rawsock:open-unix-socket-stream socket-path :direction :io)
@@ -13,7 +18,7 @@
 (defun create-tcp-socket-stream (host port)
   #+sbcl
   (let ((socket (make-instance 'sb-bsd-sockets:inet-socket :type :stream :protocol :tcp))
-        (addr (sb-bsd-sockets:make-inet-address host)))
+        (addr (resolve-host host)))
     (sb-bsd-sockets:socket-connect socket addr port)
     (sb-bsd-sockets:socket-make-stream socket :input t :output t :buffering :line))
   #-sbcl
