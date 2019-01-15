@@ -1,6 +1,6 @@
 FROM mcreations/sbcl:1.4.11
 LABEL "component"="brain"
-LABEL "version"="0.4.0"
+LABEL "version"="0.5.0"
 
 ADD *.lisp /opt/brain/
 ADD deploy/ql.lisp /tmp
