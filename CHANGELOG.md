@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - --translator can now be a tcp address in host:port format.
 - --router argument specifies Router service to connect to.
+- Dockerfile and deployment script
 
 ### Changed
 - License changed from MIT to GPLv2
